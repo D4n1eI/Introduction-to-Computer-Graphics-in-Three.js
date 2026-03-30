@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { Entity } from "./Entity.js";
+import { IUpdatableComponent } from "./IUpdatableComponent.js";
 
-export class AttackRangeComponent {
+export class AttackRangeComponent implements IUpdatableComponent {
   owner: Entity;
   size: number;
   box: THREE.Box3;
@@ -12,7 +13,7 @@ export class AttackRangeComponent {
     this.box = new THREE.Box3();
   }
 
-  update(): void {
+  update(delta: number): void {
     const object3D = this.owner.object3D;
     if (!object3D) {
       throw new Error("AttackRangeComponent: owner.object3D is null or undefined");

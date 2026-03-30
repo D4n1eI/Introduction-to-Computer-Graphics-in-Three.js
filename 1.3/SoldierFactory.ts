@@ -5,6 +5,12 @@ import { SpriteComponent } from "./SpriteComponent.js";
 import { SpriteAnimator } from "./SpriteAnimator.js";
 import { IEntityFactory } from "./IEntityFactory.js";
 import { MovementComponent } from "./MovementComponent.js";
+import { CollisionComponent } from "./CollisionComponent.js";
+import { AttackRangeComponent } from "./AttackRangeComponent.js";
+import { GravityComponent } from "./GravityComponent.js";
+import { HealthBarComponent } from "./HealthBarComponent.js";
+import { HealthComponent } from "./HealthComponent.js";
+import { AttackingComponent } from "./AttackingComponent.js";
 
 export class SoldierFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -15,15 +21,43 @@ export class SoldierFactory implements IEntityFactory {
 
   createEntity(): Soldier {
     const animationData = {
-      idle: { path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Idle-Sheet.png", tilesH: 6, tilesV: 1, numTiles: 6, frameDuration: 0.05 },
-      walk: { path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Walk-Sheet.png", tilesH: 8, tilesV: 1, numTiles: 8, frameDuration: 0.05 },
+      idle: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Idle-Sheet.png",
+        tilesH: 6,
+        tilesV: 1,
+        numTiles: 6,
+        frameDuration: 0.1
+      },
+      walk: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Walk-Sheet.png",
+        tilesH: 8,
+        tilesV: 1,
+        numTiles: 8,
+        frameDuration: 0.1
+      },
+      jump: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Jump_Fall-Sheet.png",
+        tilesH: 6,
+        tilesV: 1,
+        numTiles: 6,
+        frameDuration: 0.1
+      },
+      attack: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Attack1-Sheet.png",
+        tilesH: 8,
+        tilesV: 1,
+        numTiles: 8,
+        frameDuration: 0.1
+      },
     };
 
-    const spriteComponent = new SpriteComponent(new THREE.SpriteMaterial({
+    const spriteMaterial = new THREE.SpriteMaterial({
       map: this.animationLoader.loadTexture(animationData.idle.path),
       transparent: true,
       alphaTest: 0.1
-    }));
+    });
+
+    const spriteComponent = new SpriteComponent(spriteMaterial);
     spriteComponent.sprite.scale.set(2, 2, 2);
 
     for (const [name, data] of Object.entries(animationData)) {
@@ -34,13 +68,20 @@ export class SoldierFactory implements IEntityFactory {
 
     spriteComponent.playAnimation("idle");
 
-    const soldier = new Soldier();
+    const soldier = new Soldier(new THREE.Object3D());
 
+    const collision = new CollisionComponent(soldier.object3D, new THREE.Vector3(0.33, 0.33, 0.33));
+
+    soldier.addComponent("collision", collision);
+    soldier.addComponent("attackRange", new AttackRangeComponent(soldier, 1));
     soldier.addComponent("sprite", spriteComponent);
     soldier.addComponent("movement", new MovementComponent(soldier.object3D, 3, 4));
-
-    soldier.object3D.position.set(0, 0, 0);
-
+    soldier.addComponent("gravity", new GravityComponent(soldier.object3D, collision));
+    soldier.addComponent("health", new HealthComponent(100));
+    soldier.addComponent("healthbar", new HealthBarComponent(soldier.object3D, 1, 0.1));
+    soldier.addComponent("attack", new AttackingComponent());
+    soldier.object3D.add(spriteComponent.container);
+    soldier.object3D.position.set(-2, 2, 0);
     return soldier;
   }
 }

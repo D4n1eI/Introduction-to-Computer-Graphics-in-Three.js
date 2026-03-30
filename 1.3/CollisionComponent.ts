@@ -1,36 +1,58 @@
 import * as THREE from "three";
+import { IUpdatableComponent } from "./IUpdatableComponent";
 
-export class CollisionComponent {
+export class CollisionComponent implements IUpdatableComponent {
   object3D: THREE.Object3D;
+
   collisionBox: THREE.Box3;
   collisionBoxHelper: THREE.Box3Helper;
 
-  constructor(object3D: THREE.Object3D) {
+  private localBox?: THREE.Box3;
+  private useMeshBounds: boolean;
+
+  isOnGround: boolean;
+
+  constructor(object3D: THREE.Object3D, size?: THREE.Vector3) {
     this.object3D = object3D;
-    this.collisionBox = new THREE.Box3(
-      new THREE.Vector3(-0.4, -0.4, -0.4),
-      new THREE.Vector3(0.4, 0.4, 0.4)
-    );
+    this.collisionBox = new THREE.Box3();
+
+    if (size) {
+      this.localBox = new THREE.Box3(
+        size.clone().multiplyScalar(-0.5),
+        size.clone().multiplyScalar(0.5)
+      );
+      this.useMeshBounds = false;
+    } else {
+      const box = new THREE.Box3().setFromObject(object3D);
+      const localSize = new THREE.Vector3();
+      box.getSize(localSize);
+      
+      this.localBox = new THREE.Box3(
+        localSize.clone().multiplyScalar(-0.5),
+        localSize.clone().multiplyScalar(0.5)
+      );
+      this.useMeshBounds = false; 
+    }
+
     this.collisionBoxHelper = new THREE.Box3Helper(this.collisionBox, 0x00ff00);
+    this.isOnGround = false;
   }
 
   checkCollision(other: { collisionBox: THREE.Box3 }): boolean {
     return this.collisionBox.intersectsBox(other.collisionBox);
   }
 
-  updateCollisionBox(): void {
-    if (!this.object3D) {
-      console.error(
-        "updateCollisionBox called but object3D is null. Subclass must set this.object3D!"
-      );
-      return;
+  update(delta: number): void {
+    this.object3D.updateMatrixWorld(true); 
+
+    if (this.localBox) {
+      this.collisionBox.copy(this.localBox);
+      this.collisionBox.applyMatrix4(this.object3D.matrixWorld);
+    } else {
+      this.collisionBox.setFromObject(this.object3D);
     }
-    const width = this.object3D.scale.x * 0.2;
-    const height = this.object3D.scale.y * 0.2;
-    const depth = this.object3D.scale.z * 0.2;
-    this.collisionBox.setFromCenterAndSize(
-      this.object3D.position,
-      new THREE.Vector3(width, height, depth)
-    );
+
+    this.collisionBoxHelper.box.copy(this.collisionBox);
+    this.collisionBoxHelper.updateMatrixWorld(true);
   }
 }

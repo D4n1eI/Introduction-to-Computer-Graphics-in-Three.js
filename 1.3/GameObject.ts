@@ -3,11 +3,11 @@ import { CollisionComponent } from "./CollisionComponent.js";
 
 export class GameObject {
   object3D: THREE.Object3D;
-  collisionComponent: CollisionComponent;
+  collisionComponent?: CollisionComponent;
 
-  constructor(object3D: THREE.Object3D) {
+  constructor(object3D: THREE.Object3D,collisionComponent?:CollisionComponent) {
     this.object3D = object3D;
-    this.collisionComponent = new CollisionComponent(this.object3D);
+    this.collisionComponent = collisionComponent;
   }
 
   getPosition(): THREE.Vector3 {
@@ -19,6 +19,6 @@ export class GameObject {
   }
 
   update(delta: number): void {
-    this.collisionComponent.updateCollisionBox();
+    this.collisionComponent?.update(delta);
   }
 }
