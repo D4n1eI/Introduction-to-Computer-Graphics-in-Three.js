@@ -32,7 +32,7 @@ export class SpriteAnimator {
   reset(): void {
     this.currentTile = 0;
     this.currentDisplayTime = 0;
-    this.texture.offset.set(0, 1 - 1 / this.tilesVertical);
+    this.updateOffset();
   }
 
   update(delta: number): void {
@@ -40,17 +40,23 @@ export class SpriteAnimator {
 
     while (this.currentDisplayTime >= this.tileDisplayDuration) {
       this.currentDisplayTime -= this.tileDisplayDuration;
-      this.currentTile++;
-
-      if (this.currentTile >= this.numberOfTiles) {
+      
+      const nextTile = this.currentTile + 1;
+      if (nextTile >= this.numberOfTiles) {
         this.currentTile = 0;
+      } else {
+        this.currentTile = nextTile;
       }
 
-      const currentColumn = this.currentTile % this.tilesHorizontal;
-      const currentRow = Math.floor(this.currentTile / this.tilesHorizontal);
-
-      this.texture.offset.x = currentColumn / this.tilesHorizontal;
-      this.texture.offset.y = 1 - (currentRow + 1) / this.tilesVertical;
+      this.updateOffset();
     }
+  }
+
+  private updateOffset(): void {
+    const currentColumn = this.currentTile % this.tilesHorizontal;
+    const currentRow = Math.floor(this.currentTile / this.tilesHorizontal);
+
+    this.texture.offset.x = currentColumn / this.tilesHorizontal;
+    this.texture.offset.y = 1 - (currentRow + 1) / this.tilesVertical;
   }
 }

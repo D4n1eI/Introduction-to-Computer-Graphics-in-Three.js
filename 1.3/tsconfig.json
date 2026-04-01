@@ -2,10 +2,13 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "classic",
+    "moduleResolution": "Bundler",
     "lib": ["ESNext", "DOM"],
     "strict": true,
     "outDir": "./dist",
+    "declaration": false,
+    "sourceMap": false,
+    "noEmit": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },

@@ -13,7 +13,6 @@ import { Slime } from "./Slime.js";
 
 import { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { HealthBarSystem } from "./HealthBarSystem.js";
-import { SpriteAnimationSystem } from "./SpriteAnimationSystem.js";
 import { CollisionSystem } from "./CollisionSystem.js";
 import { InputSystem } from "./InputSystem.js";
 import { SoldierMovementSystem } from "./SoldierMovementSystem.js";
@@ -22,6 +21,9 @@ import { SoldierAnimationSystem } from "./SoldierAnimationSystem.js";
 import { SoldierAttackingSystem } from "./SoldierAttackingSystem.js";
 import { SlimeAnimationSystem } from "./SlimeAnimationSystem.js";
 import { SlimeMovementSystem } from "./SlimeMovementSystem.js";
+import { SlimeAttackingSystem } from "./SlimeAttackingSystem.js";
+import { AnimationFrameSystem } from "./SpriteAnimationSystem.js";
+
 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -64,7 +66,8 @@ const inputSystem = new InputSystem();
 
 
 const healthBarSystem = new HealthBarSystem([soldier, slime]);
-const animationSystem = new SpriteAnimationSystem([soldier, slime]);
+// const animationSystem = new SpriteAnimationSystem([soldier, slime]);
+const animationFrameSystem = new AnimationFrameSystem([soldier, slime]);
 const collisionSystem = new CollisionSystem([soldier, slime, block]);
 const soldierMovementSystem = new SoldierMovementSystem(
   soldier.getComponent("movement"),
@@ -72,12 +75,14 @@ const soldierMovementSystem = new SoldierMovementSystem(
   inputSystem
 );
 const slimeMovementSystem = new SlimeMovementSystem(
-  slime.getComponent("movement")
+  slime.getComponent("movement"),
+  soldier,
 );
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
 const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem,soldier.getComponent("attack"));
 const slimeAnimationSystem = new SlimeAnimationSystem(slime);
+const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack"),slime.getComponent("attackRange"),soldier);
 // ----------------------------
 // Updatable systems array
 // ----------------------------
@@ -86,16 +91,19 @@ const slimeAnimationSystem = new SlimeAnimationSystem(slime);
 // 2) Scene system updates all entities/components and applies movement
 // 3) Collision system corrects invalid positions (ground, walls)
 // 4) Visual-only systems (health bar, animation)
+
 const updatableSystems: IUpdatableSystem[] = [
-  soldierMovementSystem,
-  soldierAnimationSystem,
-  slimeMovementSystem,
-  slimeAnimationSystem,
-  sceneSystem,
-  collisionSystem,
-  healthBarSystem,
-  animationSystem,
-  soldierAttackingSystem
+    soldierMovementSystem,
+    soldierAttackingSystem,
+    slimeMovementSystem,
+    slimeAttackingSystem,   
+    sceneSystem,
+    collisionSystem,
+    healthBarSystem,
+    soldierAnimationSystem,
+    slimeAnimationSystem,
+    animationFrameSystem
+    //animationSystem,    
 ];
 
 const eventDrivenSystems: IEventDrivenSystem[] = [

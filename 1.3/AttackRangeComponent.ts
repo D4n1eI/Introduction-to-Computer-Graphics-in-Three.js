@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { Entity } from "./Entity.js";
-import { IUpdatableComponent } from "./IUpdatableComponent.js";
+import { CollisionComponent } from "./CollisionComponent.js";
+import { IUpdatableBox } from "./IUpdatableBox.js";
 
-export class AttackRangeComponent implements IUpdatableComponent {
+export class AttackRangeComponent implements IUpdatableBox {
   owner: Entity;
   size: number;
   box: THREE.Box3;
@@ -30,9 +31,10 @@ export class AttackRangeComponent implements IUpdatableComponent {
   }
 
   checkCollision(other: Entity): boolean {
-    if (!other.collisionComponent) {
-      throw new Error("AttackRangeComponent: other entity has no collision component");
+    const otherCollision = other.getComponent<CollisionComponent>("collision");
+    if (!otherCollision) {
+        return false;
     }
-    return this.box.intersectsBox(other.collisionComponent.collisionBox);
+    return this.box.intersectsBox(otherCollision.collisionBox);
   }
 }

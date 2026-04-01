@@ -28,12 +28,21 @@ export class SlimeFactory implements IEntityFactory {
         numTiles: 6,
         frameDuration: 0.1
       },
+
       walk: {
         path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Jump_Fall-Sheet.png",
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
         frameDuration: 0.1
+      },
+
+      attack: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Attack1-Sheet.png",
+        tilesH: 8,
+        tilesV: 1,
+        numTiles: 8,
+        frameDuration: 0.155
       },
     };
 
@@ -57,7 +66,7 @@ export class SlimeFactory implements IEntityFactory {
     const slime = new Slime(new THREE.Object3D());
 
     const collision = new CollisionComponent(slime.object3D, new THREE.Vector3(0.33, 0.33, 0.33));
-
+    
     slime.addComponent("collision", collision);
     slime.addComponent("attackRange", new AttackRangeComponent(slime, 1));
     slime.addComponent("sprite", spriteComponent);
@@ -65,7 +74,7 @@ export class SlimeFactory implements IEntityFactory {
     slime.addComponent("gravity", new GravityComponent(slime.object3D, collision));
     slime.addComponent("health", new HealthComponent(50));
     slime.addComponent("healthbar", new HealthBarComponent(slime.object3D, 0.5, 0.05));
-    slime.addComponent("attack",new AttackingComponent());
+    slime.addComponent("attack",new AttackingComponent(0.8,4));
     slime.object3D.add(spriteComponent.sprite);
     slime.object3D.position.set(2, 2, 0);
 

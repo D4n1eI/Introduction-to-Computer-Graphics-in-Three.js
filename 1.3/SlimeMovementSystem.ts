@@ -1,18 +1,20 @@
 import * as THREE from "three";
 import { IUpdatableSystem } from "./IUpdatableSystem";
 import { MovementComponent } from "./MovementComponent";
+import { Soldier } from "./Soldier";
 
 
 enum SlimeState {
-    Walking,
-    Breathing
+    Wander,
+    Breathing,
+    Seek,
 }
 
 export class SlimeMovementSystem implements IUpdatableSystem {
 
     movement: MovementComponent;
 
-    private state: SlimeState = SlimeState.Walking;
+    private state: SlimeState = SlimeState.Wander;
 
     private currentDirection: THREE.Vector3;
     private timer: number = 0;
@@ -20,10 +22,11 @@ export class SlimeMovementSystem implements IUpdatableSystem {
     private walkDuration: number = 1.5;     
     private breatheDuration: number = 2;  
     private speed: number = 0.4;
+    private player : Soldier;
 
-    constructor(movement: MovementComponent) {
+    constructor(movement: MovementComponent, player: Soldier) {
         this.movement = movement;
-
+        this.player = player;
         this.currentDirection = this.generateDirection();
     }
 
@@ -33,7 +36,7 @@ export class SlimeMovementSystem implements IUpdatableSystem {
 
         switch (this.state) {
 
-            case SlimeState.Walking:
+            case SlimeState.Wander:
 
                 this.movement.setVelocity(
                     this.currentDirection.x * this.speed,
@@ -56,9 +59,12 @@ export class SlimeMovementSystem implements IUpdatableSystem {
                 if (this.timer >= this.breatheDuration) {
                     this.timer = 0;
                     this.currentDirection = this.generateDirection();
-                    this.state = SlimeState.Walking;
+                    this.state = SlimeState.Wander;
                 }
 
+                break;
+            
+            case SlimeState.Seek:
                 break;
         }
     }

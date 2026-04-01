@@ -27,13 +27,23 @@ export class SlimeAnimationSystem implements IUpdatableSystem{
         }
 
         if (attack.isAttacking) {
-            sprite.setFlipX(movement.velocity.x < 0); 
+    // Stop horizontal movement
+            movement.velocity.x = 0;
+            movement.velocity.z = 0;
+
+            // Play attack animation and keep facing the same direction
+            sprite.setFlipX(movement.velocity.x < 0);
             sprite.playAnimation("attack");
+
+            // Skip all other movement/animations
             return;
+        
         } else if (horizontalSpeed > 0.1) {
             sprite.playAnimation("walk");
+
         } else {
             sprite.playAnimation("idle");
+
         }
     }   
 }

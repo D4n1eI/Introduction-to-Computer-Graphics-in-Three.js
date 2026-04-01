@@ -3,6 +3,8 @@ import { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { GameObject } from "./GameObject.js";
 import { Entity } from "./Entity.js";
 import { CollisionComponent } from "./CollisionComponent.js";
+import { AttackingComponent } from "./AttackingComponent.js";
+import { IComponent } from "./IComponent.js";
 
 interface SceneSystemOptions {
   renderer: THREE.WebGLRenderer;
@@ -46,11 +48,16 @@ export class SceneSystem implements IUpdatableSystem {
     const collision = gameObject.collisionComponent || (gameObject instanceof Entity ? gameObject.getComponent<CollisionComponent>("collision") : undefined);
     const helper = collision?.collisionBoxHelper;
 
+
     if (helper) {
       helper.updateMatrixWorld(true);
       helper.visible = true;
       this.scene.add(helper);
     }
+  }
+
+  addHelper(component : IComponent){
+    
   }
 
   removeGameObject(gameObject: GameObject) {
