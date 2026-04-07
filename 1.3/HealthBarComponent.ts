@@ -2,28 +2,34 @@ import * as THREE from "three";
 import { IComponent } from "./IComponent";
 
 export class HealthBarComponent implements IComponent {
-    private barMesh: THREE.Mesh;
+    private barMesh: THREE.Sprite;
     private maxBarWidth: number;
 
     constructor(parent: THREE.Object3D, width: number = 2, height: number = 0.2) {
         this.maxBarWidth = width;
-        const barY = 0.5; // Uniform height for both bars
+        const barY = 0.6; 
 
-        // Background (gray)
-        const bgGeo = new THREE.PlaneGeometry(width, height);
-        const bgMat = new THREE.MeshBasicMaterial({ color: 0x333333 });
-        const bgMesh = new THREE.Mesh(bgGeo, bgMat);
+        const loader = new THREE.TextureLoader();
+
+        // Background (gray - frame 00)
+        const bgTex = loader.load("Pixel UI pack 3/00.png");
+        bgTex.magFilter = THREE.NearestFilter;
+        bgTex.minFilter = THREE.NearestFilter;
+        const bgMat = new THREE.SpriteMaterial({ map: bgTex, transparent: true });
+        const bgMesh = new THREE.Sprite(bgMat);
+        bgMesh.scale.set(width, height, 1);
         bgMesh.position.y = barY; 
         parent.add(bgMesh);
 
-        // Health bar (red)
-        const barGeo = new THREE.PlaneGeometry(1, height);
-        barGeo.translate(0.5, 0, 0);
+        // Health bar (red - frame 01)
+        const barTex = loader.load("Pixel UI pack 3/01.png");
+        barTex.magFilter = THREE.NearestFilter;
+        barTex.minFilter = THREE.NearestFilter;
+        const barMat = new THREE.SpriteMaterial({ map: barTex, transparent: true });
+        this.barMesh = new THREE.Sprite(barMat);
         
-        const barMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        this.barMesh = new THREE.Mesh(barGeo, barMat);
-        
-        this.barMesh.scale.x = width;
+        this.barMesh.center.set(0, 0.5); // Center left
+        this.barMesh.scale.set(width, height, 1);
         this.barMesh.position.set(-width / 2, barY, 0.01); 
         parent.add(this.barMesh);
     }
