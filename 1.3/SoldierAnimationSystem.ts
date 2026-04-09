@@ -1,11 +1,12 @@
-import { IUpdatableSystem } from "./IUpdatableSystem";
-import { Entity } from "./Entity";
-import { Soldier } from "./Soldier";
-import { MovementComponent } from "./MovementComponent";
-import { SpriteComponent } from "./SpriteComponent";
-import { GravityComponent } from "./GravityComponent";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
+import { Entity } from "./Entity.js";
+import { Soldier } from "./Soldier.js";
+import { MovementComponent } from "./MovementComponent.js";
+import { SpriteComponent } from "./SpriteComponent.js";
+import { GravityComponent } from "./GravityComponent.js";
 import * as THREE from "three";
-import { AttackingComponent } from "./AttackingComponent";
+import { AttackingComponent } from "./AttackingComponent.js";
+import { HealthComponent } from "./HealthComponent.js";
 
 export class SoldierAnimationSystem implements IUpdatableSystem {
     soldier : Soldier
@@ -20,6 +21,7 @@ export class SoldierAnimationSystem implements IUpdatableSystem {
         const sprite = this.soldier.getComponent<SpriteComponent>("sprite");
         const gravity = this.soldier.getComponent<GravityComponent>("gravity");
         const attack = this.soldier.getComponent<AttackingComponent>("attack");
+        const health = this.soldier.getComponent<HealthComponent>("health");
         const velocityX = movement.velocity.x;
         const horizontalSpeed = new THREE.Vector2(
             movement.velocity.x,
@@ -27,6 +29,11 @@ export class SoldierAnimationSystem implements IUpdatableSystem {
         ).length();
 
         sprite.setFlipX(this.facingLeft);
+
+        if (health && health.hurtTimer > 0) {
+            sprite.playAnimation("hurt");
+            return;
+        }
 
         if (attack.isAttacking) {
             sprite.playAnimation("attack");

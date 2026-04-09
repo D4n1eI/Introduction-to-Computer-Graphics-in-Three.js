@@ -1,11 +1,13 @@
 import * as THREE from "three";
-import { IUpdatableSystem } from "./IUpdatableSystem";
-import { AttackingComponent } from "./AttackingComponent";
-import { InputSystem } from "./InputSystem";
-import { Slime } from "./Slime";
-import { GravityComponent } from "./GravityComponent";
-import { SpriteComponent } from "./SpriteComponent";
-import { MovementComponent } from "./MovementComponent";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
+import { AttackingComponent } from "./AttackingComponent.js";
+import { InputSystem } from "./InputSystem.js";
+import { Slime } from "./Slime.js";
+import { GravityComponent } from "./GravityComponent.js";
+import { SpriteComponent } from "./SpriteComponent.js";
+import { MovementComponent } from "./MovementComponent.js";
+import { HealthComponent } from "./HealthComponent.js";
+
 export class SlimeAnimationSystem implements IUpdatableSystem{
     slime : Slime;
     constructor(slime:Slime){
@@ -16,6 +18,7 @@ export class SlimeAnimationSystem implements IUpdatableSystem{
         const movement = this.slime.getComponent<MovementComponent>("movement");
         const sprite = this.slime.getComponent<SpriteComponent>("sprite");
         const attack = this.slime.getComponent<AttackingComponent>("attack");
+        const health = this.slime.getComponent<HealthComponent>("health");
 
         const horizontalSpeed = new THREE.Vector2(
             movement.velocity.x,
@@ -24,6 +27,11 @@ export class SlimeAnimationSystem implements IUpdatableSystem{
 
         if (Math.abs(movement.velocity.x) > 0.01) {
             sprite.setFlipX(movement.velocity.x < 0); 
+        }
+
+        if (health && health.hurtTimer > 0) {
+            sprite.playAnimation("hurt");
+            return;
         }
 
         if (attack.isAttacking) {

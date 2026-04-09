@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { IUpdatableSystem } from "./IUpdatableSystem";
-import { MovementComponent } from "./MovementComponent";
-import { Soldier } from "./Soldier";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
+import { MovementComponent } from "./MovementComponent.js";
+import { Soldier } from "./Soldier.js";
 
 
 enum SlimeState {

@@ -17,6 +17,7 @@ export class HealthBarSystem implements IUpdatableSystem {
 
             if (!healthComponent || !barComponent) continue;
 
+            healthComponent.update(delta);
             const percent = healthComponent.currentHealth / healthComponent.maxHealth;
             barComponent.update(percent);
         }

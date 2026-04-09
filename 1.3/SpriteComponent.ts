@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { SpriteAnimator } from "./SpriteAnimator.js";
 import { SpriteAnimationManager } from "./SpriteAnimationManager.js";
-import { IUpdatableComponent } from "./IUpdatableComponent.js";
+import type { IUpdatableComponent } from "./IUpdatableComponent.js";
 
 export class SpriteComponent implements IUpdatableComponent{
 

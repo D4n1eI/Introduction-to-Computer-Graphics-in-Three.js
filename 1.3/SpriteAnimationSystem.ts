@@ -1,6 +1,6 @@
-import { Entity } from "./Entity";
-import { IUpdatableSystem } from "./IUpdatableSystem";
-import { SpriteComponent } from "./SpriteComponent";
+import { Entity } from "./Entity.js";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
+import { SpriteComponent } from "./SpriteComponent.js";
 
 export class AnimationFrameSystem implements IUpdatableSystem {
     private entities: Entity[];

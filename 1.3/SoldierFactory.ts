@@ -3,7 +3,7 @@ import { Soldier } from "./Soldier.js";
 import { AnimationLoader } from "./AnimationLoader.js";
 import { SpriteComponent } from "./SpriteComponent.js";
 import { SpriteAnimator } from "./SpriteAnimator.js";
-import { IEntityFactory } from "./IEntityFactory.js";
+import type { IEntityFactory } from "./IEntityFactory.js";
 import { MovementComponent } from "./MovementComponent.js";
 import { CollisionComponent } from "./CollisionComponent.js";
 import { AttackRangeComponent } from "./AttackRangeComponent.js";
@@ -49,6 +49,13 @@ export class SoldierFactory implements IEntityFactory {
         numTiles: 8,
         frameDuration: 0.1
       },
+      hurt: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Hurt-Sheet.png",
+        tilesH: 4,
+        tilesV: 1,
+        numTiles: 4,
+        frameDuration: 0.125
+      },
     };
 
     const spriteMaterial = new THREE.SpriteMaterial({
@@ -77,7 +84,7 @@ export class SoldierFactory implements IEntityFactory {
     soldier.addComponent("sprite", spriteComponent);
     soldier.addComponent("movement", new MovementComponent(soldier.object3D, 3, 4));
     soldier.addComponent("gravity", new GravityComponent(soldier.object3D, collision));
-    soldier.addComponent("health", new HealthComponent(100));
+    soldier.addComponent("health", new HealthComponent(10));
     soldier.addComponent("healthbar", new HealthBarComponent(soldier.object3D, 1, 0.1));
     soldier.addComponent("attack", new AttackingComponent(0.4,0.6));
     soldier.object3D.add(spriteComponent.container);

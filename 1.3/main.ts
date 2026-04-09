@@ -7,16 +7,16 @@ import { SoldierFactory } from "./SoldierFactory.js";
 import { SlimeFactory } from "./SlimeFactory.js";
 import { AnimationLoader } from "./AnimationLoader.js";
 import { Block } from "./Block.js";
-import { IEntityFactory } from "./IEntityFactory.js";
+import type { IEntityFactory } from "./IEntityFactory.js";
 import { Soldier } from "./Soldier.js";
 import { Slime } from "./Slime.js";
 
-import { IUpdatableSystem } from "./IUpdatableSystem.js";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { HealthBarSystem } from "./HealthBarSystem.js";
 import { CollisionSystem } from "./CollisionSystem.js";
 import { InputSystem } from "./InputSystem.js";
 import { SoldierMovementSystem } from "./SoldierMovementSystem.js";
-import { IEventDrivenSystem } from "./IEventDrivenSystem.js";
+import type { IEventDrivenSystem } from "./IEventDrivenSystem.js";
 import { SoldierAnimationSystem } from "./SoldierAnimationSystem.js";
 import { SoldierAttackingSystem } from "./SoldierAttackingSystem.js";
 import { SlimeAnimationSystem } from "./SlimeAnimationSystem.js";
@@ -80,9 +80,9 @@ const slimeMovementSystem = new SlimeMovementSystem(
 );
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
-const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem,soldier.getComponent("attack"));
+const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, [slime]);
 const slimeAnimationSystem = new SlimeAnimationSystem(slime);
-const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack"),slime.getComponent("attackRange"),soldier);
+const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack")!, slime.getComponent("attackRange")!, soldier);
 // ----------------------------
 // Updatable systems array
 // ----------------------------
@@ -100,10 +100,9 @@ const updatableSystems: IUpdatableSystem[] = [
     sceneSystem,
     collisionSystem,
     healthBarSystem,
+    animationFrameSystem,
     soldierAnimationSystem,
-    slimeAnimationSystem,
-    animationFrameSystem
-    //animationSystem,    
+    slimeAnimationSystem
 ];
 
 const eventDrivenSystems: IEventDrivenSystem[] = [

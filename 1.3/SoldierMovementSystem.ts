@@ -1,7 +1,7 @@
-import { InputSystem } from "./InputSystem";
-import { IUpdatableSystem } from "./IUpdatableSystem";
-import { MovementComponent } from "./MovementComponent";
-import { GravityComponent } from "./GravityComponent";
+import { InputSystem } from "./InputSystem.js";
+import type { IUpdatableSystem } from "./IUpdatableSystem.js";
+import { MovementComponent } from "./MovementComponent.js";
+import { GravityComponent } from "./GravityComponent.js";
 import * as THREE from "three";
 
 export class SoldierMovementSystem implements IUpdatableSystem{

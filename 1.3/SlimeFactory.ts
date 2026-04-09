@@ -3,7 +3,7 @@ import { Slime } from "./Slime.js";
 import { AnimationLoader } from "./AnimationLoader.js";
 import { SpriteComponent } from "./SpriteComponent.js";
 import { SpriteAnimator } from "./SpriteAnimator.js";
-import { IEntityFactory } from "./IEntityFactory.js";
+import type { IEntityFactory } from "./IEntityFactory.js";
 import { MovementComponent } from "./MovementComponent.js";
 import { CollisionComponent } from "./CollisionComponent.js";
 import { AttackRangeComponent } from "./AttackRangeComponent.js";
@@ -44,6 +44,13 @@ export class SlimeFactory implements IEntityFactory {
         numTiles: 8,
         frameDuration: 0.155
       },
+      hurt: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png",
+        tilesH: 4,
+        tilesV: 1,
+        numTiles: 4,
+        frameDuration: 0.125
+      },
     };
 
     const spriteMaterial = new THREE.SpriteMaterial({
@@ -72,7 +79,7 @@ export class SlimeFactory implements IEntityFactory {
     slime.addComponent("sprite", spriteComponent);
     slime.addComponent("movement", new MovementComponent(slime.object3D, 3, 4));
     slime.addComponent("gravity", new GravityComponent(slime.object3D, collision));
-    slime.addComponent("health", new HealthComponent(50));
+    slime.addComponent("health", new HealthComponent(10));
     slime.addComponent("healthbar", new HealthBarComponent(slime.object3D, 0.5, 0.05));
     slime.addComponent("attack",new AttackingComponent(0.8,4));
     slime.object3D.add(spriteComponent.sprite);
