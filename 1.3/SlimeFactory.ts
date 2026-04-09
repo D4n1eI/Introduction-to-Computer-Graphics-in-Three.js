@@ -51,6 +51,13 @@ export class SlimeFactory implements IEntityFactory {
         numTiles: 4,
         frameDuration: 0.125
       },
+      death: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png",
+        tilesH: 10,
+        tilesV: 1,
+        numTiles: 10,
+        frameDuration: 0.1
+      },
     };
 
     const spriteMaterial = new THREE.SpriteMaterial({

@@ -11,6 +11,8 @@ interface SceneSystemOptions {
   canvas?: HTMLCanvasElement;
 }
 
+import { HealthComponent } from "./HealthComponent.js";
+
 export class SceneSystem implements IUpdatableSystem {
   public scene: THREE.Scene;
   public cameras: THREE.Camera[] = [];
@@ -62,12 +64,33 @@ export class SceneSystem implements IUpdatableSystem {
 
   removeGameObject(gameObject: GameObject) {
     this.scene.remove(gameObject.object3D);
+    
+    // Also remove collision helper if it exists
+    const collision = gameObject.collisionComponent || (gameObject instanceof Entity ? gameObject.getComponent<CollisionComponent>("collision") : undefined);
+    if (collision?.collisionBoxHelper) {
+      this.scene.remove(collision.collisionBoxHelper);
+    }
+
     this.gameObjects = this.gameObjects.filter(obj => obj !== gameObject);
   }
 
   update(delta: number) {
+    // Collect game objects to remove
+    const toRemove: GameObject[] = [];
+
     for (const obj of this.gameObjects) {
-      obj.update(delta); 
+      obj.update(delta);
+      
+      if (obj instanceof Entity) {
+        const health = obj.getComponent<HealthComponent>("health");
+        if (health && health.removalScheduled) {
+          toRemove.push(obj);
+        }
+      }
+    }
+
+    for (const obj of toRemove) {
+      this.removeGameObject(obj);
     }
   }
 

@@ -29,6 +29,11 @@ export class SlimeAnimationSystem implements IUpdatableSystem{
             sprite.setFlipX(movement.velocity.x < 0); 
         }
 
+        if (health && health.isDead) {
+            sprite.playAnimation("death");
+            return;
+        }
+
         if (health && health.hurtTimer > 0) {
             sprite.playAnimation("hurt");
             return;

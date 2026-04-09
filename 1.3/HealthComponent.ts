@@ -7,6 +7,8 @@ export class HealthComponent implements IComponent {
     maxHealth: number;
     isDead: boolean;
     hurtTimer: number = 0;
+    deathAnimationTimer: number = 0;
+    removalScheduled: boolean = false;
 
     constructor(maxHealth: number) {
         this.maxHealth = maxHealth;
@@ -18,11 +20,13 @@ export class HealthComponent implements IComponent {
         if (this.isDead) return; 
 
         this.currentHealth -= damage;
-        this.hurtTimer = 0.5; // Trigger hurt state for 0.5 seconds
-
+        
         if (this.currentHealth <= 0) {
             this.currentHealth = 0;
             this.isDead = true;
+            this.deathAnimationTimer = 1.0; // 10 frames * 0.1 duration
+        } else {
+            this.hurtTimer = 0.5; // Trigger hurt state for 0.5 seconds
         }
     }
 
@@ -30,6 +34,14 @@ export class HealthComponent implements IComponent {
         if (this.hurtTimer > 0) {
             this.hurtTimer -= delta;
             if (this.hurtTimer < 0) this.hurtTimer = 0;
+        }
+        
+        if (this.isDead && this.deathAnimationTimer > 0) {
+            this.deathAnimationTimer -= delta;
+            if (this.deathAnimationTimer <= 0) {
+                this.deathAnimationTimer = 0;
+                this.removalScheduled = true;
+            }
         }
     }
 

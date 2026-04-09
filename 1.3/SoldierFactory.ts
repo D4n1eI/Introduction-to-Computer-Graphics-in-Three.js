@@ -56,6 +56,13 @@ export class SoldierFactory implements IEntityFactory {
         numTiles: 4,
         frameDuration: 0.125
       },
+      death: {
+        path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Death-Sheet.png",
+        tilesH: 10,
+        tilesV: 1,
+        numTiles: 10,
+        frameDuration: 0.1
+      },
     };
 
     const spriteMaterial = new THREE.SpriteMaterial({

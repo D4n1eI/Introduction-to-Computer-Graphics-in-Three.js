@@ -30,6 +30,11 @@ export class SoldierAnimationSystem implements IUpdatableSystem {
 
         sprite.setFlipX(this.facingLeft);
 
+        if (health && health.isDead) {
+            sprite.playAnimation("death");
+            return;
+        }
+
         if (health && health.hurtTimer > 0) {
             sprite.playAnimation("hurt");
             return;
