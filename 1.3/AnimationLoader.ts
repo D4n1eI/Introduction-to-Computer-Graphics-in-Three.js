@@ -19,7 +19,9 @@ export class AnimationLoader {
   loadEntityAnimations(animationPaths: Record<string,string>): Record<string, THREE.Texture> {
     const animations: Record<string, THREE.Texture> = {};
     for (const key in animationPaths) {
-      animations[key] = this.loadTexture(animationPaths[key]);
+      if (animationPaths[key]) {
+        animations[key] = this.loadTexture(animationPaths[key]);
+      }
     }
     return animations;
   }

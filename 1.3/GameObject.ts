@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import { CollisionComponent } from "./CollisionComponent.js";
+import { type CollisionComponent } from "./CollisionComponent.js";
 
 export class GameObject {
   object3D: THREE.Object3D;
   collisionComponent?: CollisionComponent;
 
-  constructor(object3D: THREE.Object3D,collisionComponent?:CollisionComponent) {
+  constructor(object3D: THREE.Object3D, collisionComponent?: CollisionComponent) {
     this.object3D = object3D;
     this.collisionComponent = collisionComponent;
   }

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { IComponent } from "./IComponent";
+import { type IComponent } from "./IComponent.js";
 
 export class HealthBarComponent implements IComponent {
     private barMesh: THREE.Sprite;
@@ -22,7 +22,11 @@ export class HealthBarComponent implements IComponent {
         }
 
         // Initially use health_10 (full)
-        const barMat = new THREE.SpriteMaterial({ map: this.textures[10], transparent: true });
+        const initialTexture = this.textures[10];
+        if (!initialTexture) {
+          throw new Error("Health bar textures not loaded properly");
+        }
+        const barMat = new THREE.SpriteMaterial({ map: initialTexture, transparent: true });
         this.barMesh = new THREE.Sprite(barMat);
         
         this.barMesh.scale.set(width, height, 1);
@@ -34,8 +38,9 @@ export class HealthBarComponent implements IComponent {
         const p = Math.max(0, Math.min(1, percent));
         // Calculate index (0 to 10)
         const index = Math.round(p * 10);
-        if (this.barMesh.material.map !== this.textures[index]) {
-            this.barMesh.material.map = this.textures[index];
+        const texture = this.textures[index];
+        if (texture && this.barMesh.material.map !== texture) {
+            this.barMesh.material.map = texture;
             this.barMesh.material.needsUpdate = true;
         }
     }
