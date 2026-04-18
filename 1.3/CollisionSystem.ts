@@ -4,6 +4,9 @@ import { MovementComponent } from "./MovementComponent.js";
 import { Entity } from "./Entity.js";
 import { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { GravityComponent } from "./GravityComponent.js";
+import { HealthPack } from "./HealthPack.js";
+import { Block } from "./Block.js";
+import { HealthComponent } from "./HealthComponent.js";
 
 export class CollisionSystem implements IUpdatableSystem {
 	Entities: Entity[];
@@ -59,6 +62,24 @@ export class CollisionSystem implements IUpdatableSystem {
 
             for (let otherEntity of this.Entities) {
                 if (entity === otherEntity) continue;
+
+                // HealthPack only collides physically with blocks/ground
+                if (entity instanceof HealthPack && !(otherEntity instanceof Block)) {
+                    continue;
+                }
+                
+                // Other entities (Soldier, etc.) don't collide physically with HealthPack
+                if (otherEntity instanceof HealthPack) {
+                    continue;
+                }
+
+                // Dead entities still collide with ground (Blocks)
+                const health = entity.getComponent<HealthComponent>("health");
+                if (health && health.isDead && !(otherEntity instanceof Block)) continue;
+                
+                // Active entities don't collide with dead things
+                const otherHealth = otherEntity.getComponent<HealthComponent>("health");
+                if (otherHealth && otherHealth.isDead) continue;
 
                 const otherCollisionBox = otherEntity.getComponent<CollisionComponent>("collision");
                 if (!otherCollisionBox) continue;

@@ -6,21 +6,32 @@ import { AttackingComponent } from "./AttackingComponent.js";
 import { AttackRangeComponent } from "./AttackRangeComponent.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { CollisionComponent } from "./CollisionComponent.js";
+import { Slime } from "./Slime.js";
 
 export class SlimeAttackingSystem implements IUpdatableSystem {
 
     slimeAttack: AttackingComponent;
     player: Soldier;
     attackRange: AttackRangeComponent;
+    slimeEntity?: Slime;
     damagedPlayerThisAttack = false;
 
-    constructor(slimeAttack: AttackingComponent, attackRange: AttackRangeComponent, player: Soldier) {
+    constructor(slimeAttack: AttackingComponent, attackRange: AttackRangeComponent, player: Soldier, slimeEntity?: Slime) {
         this.slimeAttack = slimeAttack;
         this.attackRange = attackRange;
         this.player = player;
+        this.slimeEntity = slimeEntity;
     }
 
     update(delta: number) {
+        if (this.slimeEntity) {
+            const health = this.slimeEntity.getComponent<HealthComponent>("health");
+            if (health && health.isDead) {
+                this.slimeAttack.isAttacking = false;
+                return;
+            }
+        }
+
         // 1️⃣ Tick cooldown
         if (this.slimeAttack.cooldownTimer > 0) {
             this.slimeAttack.cooldownTimer -= delta;

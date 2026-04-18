@@ -7,6 +7,7 @@ import { SoldierFactory } from "./SoldierFactory.js";
 import { SlimeFactory } from "./SlimeFactory.js";
 import { AnimationLoader } from "./AnimationLoader.js";
 import { Block } from "./Block.js";
+import { Entity } from "./Entity.js";
 import type { IEntityFactory } from "./IEntityFactory.js";
 import { Soldier } from "./Soldier.js";
 import { Slime } from "./Slime.js";
@@ -23,6 +24,9 @@ import { SlimeAnimationSystem } from "./SlimeAnimationSystem.js";
 import { SlimeMovementSystem } from "./SlimeMovementSystem.js";
 import { SlimeAttackingSystem } from "./SlimeAttackingSystem.js";
 import { AnimationFrameSystem } from "./SpriteAnimationSystem.js";
+import { HealthPackFactory } from "./HealthPackFactory.js";
+import { HealthPack } from "./HealthPack.js";
+import { HealthPackPickupSystem } from "./HealthPackPickupSystem.js";
 
 
 
@@ -50,12 +54,16 @@ const loader = new AnimationLoader();
 
 const soldierFactory: IEntityFactory = new SoldierFactory(loader);
 const slimeFactory: IEntityFactory = new SlimeFactory(loader);
+const healthPackFactory: IEntityFactory = new HealthPackFactory(loader);
 
 const soldier: Soldier = soldierFactory.createEntity();
 sceneSystem.addGameObject(soldier);
 
 const slime: Slime = slimeFactory.createEntity();
 sceneSystem.addGameObject(slime);
+
+const healthPack: HealthPack = healthPackFactory.createEntity();
+sceneSystem.addGameObject(healthPack);
 
 
 const block = new Block(20, 20, 0.2);
@@ -68,7 +76,8 @@ const inputSystem = new InputSystem();
 const healthBarSystem = new HealthBarSystem([soldier, slime]);
 // const animationSystem = new SpriteAnimationSystem([soldier, slime]);
 const animationFrameSystem = new AnimationFrameSystem([soldier, slime]);
-const collisionSystem = new CollisionSystem([soldier, slime, block]);
+const healthPackPickupSystem = new HealthPackPickupSystem(sceneSystem.gameObjects as Entity[]);
+const collisionSystem = new CollisionSystem([soldier, slime, block, healthPack]);
 const soldierMovementSystem = new SoldierMovementSystem(
   soldier.getComponent("movement"),
   soldier.getComponent("gravity"),
@@ -77,12 +86,13 @@ const soldierMovementSystem = new SoldierMovementSystem(
 const slimeMovementSystem = new SlimeMovementSystem(
   slime.getComponent("movement"),
   soldier,
+  slime
 );
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
 const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, [slime]);
 const slimeAnimationSystem = new SlimeAnimationSystem(slime);
-const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack")!, slime.getComponent("attackRange")!, soldier);
+const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack")!, slime.getComponent("attackRange")!, soldier, slime);
 // ----------------------------
 // Updatable systems array
 // ----------------------------
@@ -98,6 +108,7 @@ const updatableSystems: IUpdatableSystem[] = [
     slimeMovementSystem,
     slimeAttackingSystem,   
     sceneSystem,
+    healthPackPickupSystem,
     collisionSystem,
     healthBarSystem,
     animationFrameSystem,

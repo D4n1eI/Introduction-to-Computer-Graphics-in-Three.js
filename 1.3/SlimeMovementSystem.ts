@@ -2,6 +2,8 @@ import * as THREE from "three";
 import type { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { MovementComponent } from "./MovementComponent.js";
 import { Soldier } from "./Soldier.js";
+import { HealthComponent } from "./HealthComponent.js";
+import { Slime } from "./Slime.js";
 
 
 enum SlimeState {
@@ -13,6 +15,7 @@ enum SlimeState {
 export class SlimeMovementSystem implements IUpdatableSystem {
 
     movement: MovementComponent;
+    slimeEntity?: Slime;
 
     private state: SlimeState = SlimeState.Wander;
 
@@ -24,13 +27,21 @@ export class SlimeMovementSystem implements IUpdatableSystem {
     private speed: number = 0.4;
     private player : Soldier;
 
-    constructor(movement: MovementComponent, player: Soldier) {
+    constructor(movement: MovementComponent, player: Soldier, slimeEntity?: Slime) {
         this.movement = movement;
         this.player = player;
+        this.slimeEntity = slimeEntity;
         this.currentDirection = this.generateDirection();
     }
 
     update(delta: number): void {
+        if (this.slimeEntity) {
+            const health = this.slimeEntity.getComponent<HealthComponent>("health");
+            if (health && health.isDead) {
+                this.movement.setVelocity(0, 0, 0);
+                return;
+            }
+        }
 
         this.timer += delta;
 

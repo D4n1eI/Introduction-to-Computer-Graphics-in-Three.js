@@ -3,14 +3,17 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ESNext", "DOM"],
-    "strict": true,
     "outDir": "./dist",
-    "declaration": false,
-    "sourceMap": false,
-    "noEmit": false,
+    "rootDir": "./",
+    "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
+    "lib": ["DOM", "ESNext"]
   },
-    "include": ["./*.ts"]
+  "include": ["*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
