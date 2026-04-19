@@ -27,15 +27,15 @@ export class HealthPackPickupSystem implements IUpdatableSystem {
 
         for (const hp of healthPacks) {
             const hpBox = hp.getComponent<CollisionComponent>("collision")?.collisionBox;
-            if (hpBox && soldierBox.intersectsBox(hpBox)) {
+            const hpHealth = hp.getComponent<HealthComponent>("health");
+
+            if (hpBox && hpHealth && !hpHealth.isDead && soldierBox.intersectsBox(hpBox)) {
                 soldierHealth.healDamage(5);
                 hp.object3D.visible = false;
                 
                 // Mark for removal from scene
-                const hpHealth = hp.getComponent<HealthComponent>("health");
-                if (hpHealth) {
-                    hpHealth.removalScheduled = true;
-                }
+                hpHealth.isDead = true; // Use isDead to prevent multiple pickups
+                hpHealth.removalScheduled = true;
 
                 if (this.eventObserver) {
                     this.eventObserver.emit("pickup", { 

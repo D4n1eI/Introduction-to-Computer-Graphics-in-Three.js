@@ -28,10 +28,12 @@ export class GravityComponent implements IUpdatableComponent {
         this.velocityY = 0;
     }
 
-    jump() {
+    jump(): boolean {
         if (this.collision?.isOnGround) {
             this.velocityY = this.jumpPower;
             this.collision.isOnGround = false;
+            return true;
         }
+        return false;
     }
 }

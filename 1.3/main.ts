@@ -27,15 +27,27 @@ import { AnimationFrameSystem } from "./SpriteAnimationSystem.js";
 import { HealthPackFactory } from "./HealthPackFactory.js";
 import { HealthPack } from "./HealthPack.js";
 import { HealthPackPickupSystem } from "./HealthPackPickupSystem.js";
-
+import { EventObserver } from "./EventObserver.js";
+import { SoundManager } from "./SoundManager.js";
 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const sceneSystem = new SceneSystem({ renderer });
+const soundManager = SoundManager.getInstance();
+soundManager.loadSound("jump", "SoundEffects/jump.wav");
+soundManager.loadSound("power_up", "SoundEffects/power_up.wav");
+soundManager.loadSound("hurt", "SoundEffects/hurt.wav");
+soundManager.loadSound("explosion", "SoundEffects/explosion.wav");
+soundManager.loadSound("coin", "SoundEffects/coin.wav");
+soundManager.loadSound("tap", "SoundEffects/tap.wav");
 
+// Initialize audio on first click to satisfy browser requirements
+window.addEventListener("click", () => soundManager.init(), { once: true });
+
+const sceneSystem = new SceneSystem({ renderer });
+const eventObserver = new EventObserver();
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -56,13 +68,13 @@ const soldierFactory: IEntityFactory = new SoldierFactory(loader);
 const slimeFactory: IEntityFactory = new SlimeFactory(loader);
 const healthPackFactory: IEntityFactory = new HealthPackFactory(loader);
 
-const soldier: Soldier = soldierFactory.createEntity();
+const soldier: Soldier = soldierFactory.createEntity(eventObserver) as Soldier;
 sceneSystem.addGameObject(soldier);
 
-const slime: Slime = slimeFactory.createEntity();
+const slime: Slime = slimeFactory.createEntity(eventObserver) as Slime;
 sceneSystem.addGameObject(slime);
 
-const healthPack: HealthPack = healthPackFactory.createEntity();
+const healthPack: HealthPack = healthPackFactory.createEntity(eventObserver) as HealthPack;
 sceneSystem.addGameObject(healthPack);
 
 
@@ -76,12 +88,13 @@ const inputSystem = new InputSystem();
 const healthBarSystem = new HealthBarSystem([soldier, slime]);
 // const animationSystem = new SpriteAnimationSystem([soldier, slime]);
 const animationFrameSystem = new AnimationFrameSystem([soldier, slime]);
-const healthPackPickupSystem = new HealthPackPickupSystem(sceneSystem.gameObjects as Entity[]);
+const healthPackPickupSystem = new HealthPackPickupSystem(sceneSystem.gameObjects as Entity[], eventObserver);
 const collisionSystem = new CollisionSystem([soldier, slime, block, healthPack]);
 const soldierMovementSystem = new SoldierMovementSystem(
   soldier.getComponent("movement"),
   soldier.getComponent("gravity"),
-  inputSystem
+  inputSystem,
+  eventObserver
 );
 const slimeMovementSystem = new SlimeMovementSystem(
   slime.getComponent("movement"),

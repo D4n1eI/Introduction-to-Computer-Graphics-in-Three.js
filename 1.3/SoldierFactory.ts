@@ -11,6 +11,7 @@ import { GravityComponent } from "./GravityComponent.js";
 import { HealthBarComponent } from "./HealthBarComponent.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { AttackingComponent } from "./AttackingComponent.js";
+import { EventObserver } from "./EventObserver.js";
 
 export class SoldierFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -19,7 +20,7 @@ export class SoldierFactory implements IEntityFactory {
     this.animationLoader = animationLoader;
   }
 
-  createEntity(): Soldier {
+  createEntity(eventObserver?: EventObserver): Soldier {
     const animationData = {
       idle: {
         path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Idle-Sheet.png",
@@ -91,7 +92,7 @@ export class SoldierFactory implements IEntityFactory {
     soldier.addComponent("sprite", spriteComponent);
     soldier.addComponent("movement", new MovementComponent(soldier.object3D, 3, 4));
     soldier.addComponent("gravity", new GravityComponent(soldier.object3D, collision));
-    soldier.addComponent("health", new HealthComponent(10));
+    soldier.addComponent("health", new HealthComponent(10, eventObserver));
     soldier.addComponent("healthbar", new HealthBarComponent(soldier.object3D, 1, 0.1));
     soldier.addComponent("attack", new AttackingComponent(0.4,0.6));
     soldier.object3D.add(spriteComponent.container);

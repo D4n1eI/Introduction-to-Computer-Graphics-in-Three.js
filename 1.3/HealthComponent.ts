@@ -1,5 +1,6 @@
-import { IComponent } from "./IComponent";
-import { SpriteComponent } from "./SpriteComponent";
+import { IComponent } from "./IComponent.js";
+import { SpriteComponent } from "./SpriteComponent.js";
+import { EventObserver } from "./EventObserver.js";
 import * as THREE from "three";
 
 export class HealthComponent implements IComponent {
@@ -9,11 +10,13 @@ export class HealthComponent implements IComponent {
     hurtTimer: number = 0;
     deathAnimationTimer: number = 0;
     removalScheduled: boolean = false;
+    private eventObserver?: EventObserver;
 
-    constructor(maxHealth: number) {
+    constructor(maxHealth: number, eventObserver?: EventObserver) {
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
         this.isDead = false;
+        this.eventObserver = eventObserver;
     }
 
     takeDamage(damage: number): void {
@@ -24,9 +27,15 @@ export class HealthComponent implements IComponent {
         if (this.currentHealth <= 0) {
             this.currentHealth = 0;
             this.isDead = true;
-            this.deathAnimationTimer = 1.0; // 10 frames * 0.1 duration
+            this.deathAnimationTimer = 1.0; 
+            if (this.eventObserver) {
+                this.eventObserver.emit("death");
+            }
         } else {
-            this.hurtTimer = 0.5; // Trigger hurt state for 0.5 seconds
+            this.hurtTimer = 0.5;
+            if (this.eventObserver) {
+                this.eventObserver.emit("hurt");
+            }
         }
     }
 

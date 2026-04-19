@@ -2,6 +2,7 @@ import { InputSystem } from "./InputSystem.js";
 import type { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { MovementComponent } from "./MovementComponent.js";
 import { GravityComponent } from "./GravityComponent.js";
+import { EventObserver } from "./EventObserver.js";
 import * as THREE from "three";
 
 export class SoldierMovementSystem implements IUpdatableSystem{
@@ -9,11 +10,13 @@ export class SoldierMovementSystem implements IUpdatableSystem{
     movement : MovementComponent;
     gravity : GravityComponent;
     inputSystem : InputSystem;
+    eventObserver : EventObserver;
 
-    constructor(movement : MovementComponent, gravity: GravityComponent, inputSystem : InputSystem){
+    constructor(movement : MovementComponent, gravity: GravityComponent, inputSystem : InputSystem, eventObserver: EventObserver){
         this.movement = movement;
         this.gravity = gravity;
         this.inputSystem = inputSystem;
+        this.eventObserver = eventObserver;
     }
 
 
@@ -28,7 +31,9 @@ export class SoldierMovementSystem implements IUpdatableSystem{
         if (this.inputSystem.isKeyDown("d")) direction.x += 1;
 
         if (this.inputSystem.isKeyDown(" ")) {
-            this.gravity.jump();
+            if (this.gravity.jump()) {
+                this.eventObserver.emit("jump");
+            }
         }
 
         if (direction.length() > 0) {

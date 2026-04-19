@@ -11,6 +11,7 @@ import { GravityComponent } from "./GravityComponent.js";
 import { HealthBarComponent } from "./HealthBarComponent.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { AttackingComponent } from "./AttackingComponent.js";
+import { EventObserver } from "./EventObserver.js";
 
 export class SlimeFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -19,7 +20,7 @@ export class SlimeFactory implements IEntityFactory {
     this.animationLoader = animationLoader;
   }
 
-  createEntity(): Slime {
+  createEntity(eventObserver?: EventObserver): Slime {
     const animationData = {
       idle: {
         path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Idle-Sheet.png",
@@ -86,7 +87,7 @@ export class SlimeFactory implements IEntityFactory {
     slime.addComponent("sprite", spriteComponent);
     slime.addComponent("movement", new MovementComponent(slime.object3D, 3, 4));
     slime.addComponent("gravity", new GravityComponent(slime.object3D, collision));
-    slime.addComponent("health", new HealthComponent(10));
+    slime.addComponent("health", new HealthComponent(10, eventObserver));
     slime.addComponent("healthbar", new HealthBarComponent(slime.object3D, 0.5, 0.05));
     slime.addComponent("attack",new AttackingComponent(0.8,4));
     slime.object3D.add(spriteComponent.sprite);

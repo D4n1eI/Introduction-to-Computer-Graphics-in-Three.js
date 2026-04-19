@@ -7,6 +7,7 @@ import { GravityComponent } from "./GravityComponent.js";
 import { HealthPack } from "./HealthPack.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { CollisionComponent } from "./CollisionComponent.js";
+import { EventObserver } from "./EventObserver.js";
 
 export class HealthPackFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -15,7 +16,7 @@ export class HealthPackFactory implements IEntityFactory {
     this.animationLoader = animationLoader;
   }
 
-  createEntity(): HealthPack {
+  createEntity(eventObserver?: EventObserver): HealthPack {
     const animationData = {
       idle: {
         path: "HealthPack/Heart Pickup.png",
@@ -47,7 +48,7 @@ export class HealthPackFactory implements IEntityFactory {
     const healthPackCollision = new CollisionComponent(healthPack.object3D, new THREE.Vector3(0.33, 0.33, 0.33));
 
     healthPack.addComponent("sprite", spriteComponent);
-    healthPack.addComponent("health", new HealthComponent(1));
+    healthPack.addComponent("health", new HealthComponent(1, eventObserver));
     healthPack.addComponent("collision", healthPackCollision);
     healthPack.addComponent("gravity", new GravityComponent(healthPack.object3D));
     

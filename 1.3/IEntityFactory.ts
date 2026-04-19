@@ -1,5 +1,6 @@
 import { Entity } from "./Entity";
+import { EventObserver } from "./EventObserver";
 
 export interface IEntityFactory {
-  createEntity(): Entity;
+  createEntity(eventObserver?: EventObserver): Entity;
 }
