@@ -30,6 +30,8 @@ import { HealthPackPickupSystem } from "./HealthPackPickupSystem.js";
 import { EventObserver } from "./EventObserver.js";
 import { SoundManager } from "./SoundManager.js";
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -80,7 +82,14 @@ sceneSystem.addGameObject(healthPack);
 
 const block = new Block(20, 20, 0.2);
 sceneSystem.addGameObject(block);
+block.setPosition(0,-2.7,0)
 
+sceneSystem.addLight(new THREE.AmbientLight(0xffffff, 0.5));
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(5, 10, 5);
+
+sceneSystem.addLight(dirLight);
 
 const inputSystem = new InputSystem();
 
@@ -135,9 +144,31 @@ const eventDrivenSystems: IEventDrivenSystem[] = [
 
 const clock = new THREE.Clock();
 
+
+const mapLoader = new GLTFLoader();
+
+mapLoader.load(
+  'map-model/map.glb',
+  (gltf) => {
+
+    const model = gltf.scene;
+
+    sceneSystem.scene.add(model);
+
+    model.scale.set(0.4, .4, .4);
+    model.position.set(0, -3, 0);
+
+    console.log("Model loaded:", model);
+
+  },
+  undefined,
+  (error) => {
+    console.error("GLB load error:", error);
+  }
+);
+
 function animate() {
   requestAnimationFrame(animate);
-
   const delta = clock.getDelta();
   controls.update();
   updatableSystems.forEach(system => system.update(delta));
