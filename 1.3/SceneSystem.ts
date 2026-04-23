@@ -47,20 +47,15 @@ export class SceneSystem implements IUpdatableSystem {
     this.gameObjects.push(gameObject);
     this.scene.add(gameObject.object3D);
 
-    const collision = gameObject.collisionComponent || (gameObject instanceof Entity ? gameObject.getComponent<CollisionComponent>("collision") : undefined);
-    const helper = collision?.collisionBoxHelper;
+    const collision =
+      gameObject.collisionComponent ||
+      (gameObject instanceof Entity
+        ? gameObject.getComponent<CollisionComponent>("collision")
+        : undefined);
 
 
-    if (helper) {
-      helper.updateMatrixWorld(true);
-      helper.visible = true;
-      this.scene.add(helper);
-    }
   }
 
-  addHelper(component : IComponent){
-    
-  }
 
   removeGameObject(gameObject: GameObject) {
     this.scene.remove(gameObject.object3D);

@@ -6,6 +6,7 @@ import { IUpdatableSystem } from "./IUpdatableSystem.js";
 import { GravityComponent } from "./GravityComponent.js";
 import { HealthPack } from "./HealthPack.js";
 import { Block } from "./Block.js";
+import { GameObject } from "./GameObject.js";
 import { HealthComponent } from "./HealthComponent.js";
 
 export class CollisionSystem implements IUpdatableSystem {
@@ -16,6 +17,7 @@ export class CollisionSystem implements IUpdatableSystem {
     }
     
     update(delta: number): void {
+        const EPSILON = 0.02;
         const originalPositions = new Map<Entity, THREE.Vector3>();
 
         // Reset ground state before processing collisions
@@ -40,7 +42,7 @@ export class CollisionSystem implements IUpdatableSystem {
             if (movement && movement.velocity.lengthSq() > 0) {
                 const step = movement.velocity.clone();
                 if (step.length() > movement.maxSpeed) {
-                    step.setLength(movement.maxSpeed);
+                    step.setLength(movement.maxSpeed);  
                 }
                 step.multiplyScalar(movement.speed * delta);
                 originalPos.sub(step);
@@ -63,9 +65,10 @@ export class CollisionSystem implements IUpdatableSystem {
             for (let otherEntity of this.Entities) {
                 if (entity === otherEntity) continue;
 
-                // HealthPack only collides physically with blocks/ground
-                if (entity instanceof HealthPack && !(otherEntity instanceof Block)) {
-                    continue;
+                // HealthPack only collides physically with blocks/ground/floor
+                if (entity instanceof HealthPack) {
+                    const isGround = otherEntity instanceof Block || (otherEntity instanceof GameObject && !(otherEntity instanceof Entity));
+                    if (!isGround) continue;
                 }
                 
                 // Other entities (Soldier, etc.) don't collide physically with HealthPack
@@ -104,20 +107,37 @@ export class CollisionSystem implements IUpdatableSystem {
 
                     if (isFalling && wasAbove) {
 
-                        entity.object3D.position.y = boxB.max.y + height / 2;
+                        const targetY = boxB.max.y + height / 2;
+                        const currentY = entity.object3D.position.y;
 
-                        if (gravity) gravity.resetVelocity();
+                        if (Math.abs(currentY - targetY) > EPSILON) {
+                            entity.object3D.position.y = targetY;
+                        }
+
+                        // lock physics state ONLY once stable
+                        if (gravity) {
+                            gravity.velocityY = 0;
+                        }
+
                         collisionBox.isOnGround = true;
 
                     } else {
 
                         if (originalPos) {
-                            entity.object3D.position.copy(originalPos);
+                            const diff = entity.object3D.position.distanceTo(originalPos);
+
+                            if (diff > EPSILON) {
+                                entity.object3D.position.copy(originalPos);
+                            }
                         }
                     }
 
-                    entity.object3D.updateMatrixWorld(true);
-                    collisionBox.update(delta);
+                    for (const entity of this.Entities) {
+                    const collision = entity.getComponent<CollisionComponent>("collision");
+                    if (collision) {
+                        collision.update(delta);
+                    }
+                }
                 }
             }
         }

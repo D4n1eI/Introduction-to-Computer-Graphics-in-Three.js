@@ -31,6 +31,11 @@ import { EventObserver } from "./EventObserver.js";
 import { SoundManager } from "./SoundManager.js";
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GameMapLoader } from "./GameMapLoader.js";
+import { GameMap } from "./GameMap.js";
+import { MapEntity } from "./MapEntity.js";
+import { CollisionComponent } from "./CollisionComponent.js";
+import { GameObject } from "./GameObject.js";
 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -57,7 +62,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 5, 10);
+camera.position.set(0, 2, 10);
 sceneSystem.addCamera(camera, true);
 
 
@@ -72,15 +77,22 @@ const healthPackFactory: IEntityFactory = new HealthPackFactory(loader);
 
 const soldier: Soldier = soldierFactory.createEntity(eventObserver) as Soldier;
 sceneSystem.addGameObject(soldier);
+soldier.setPosition(0, 20, 0); // Spawn high to test falling
 
 const slime: Slime = slimeFactory.createEntity(eventObserver) as Slime;
 sceneSystem.addGameObject(slime);
+slime.setPosition(3, 20, 0); // Spawn high to test falling
+
+const timer: number = window.setTimeout(() => {
+  console.log("Done");
+}, 30000);
 
 const healthPack: HealthPack = healthPackFactory.createEntity(eventObserver) as HealthPack;
 sceneSystem.addGameObject(healthPack);
+healthPack.setPosition(-3, 20, 0); // Spawn high to test falling
 
 
-const block = new Block(20, 20, 0.2);
+const block = new Block(100, 100, 0.2);
 sceneSystem.addGameObject(block);
 block.setPosition(0,-2.7,0)
 
@@ -98,7 +110,8 @@ const healthBarSystem = new HealthBarSystem([soldier, slime]);
 // const animationSystem = new SpriteAnimationSystem([soldier, slime]);
 const animationFrameSystem = new AnimationFrameSystem([soldier, slime]);
 const healthPackPickupSystem = new HealthPackPickupSystem(sceneSystem.gameObjects as Entity[], eventObserver);
-const collisionSystem = new CollisionSystem([soldier, slime, block, healthPack]);
+// Collision system - will be updated after map loads
+let collisionSystem = new CollisionSystem([soldier, slime, block, healthPack]);
 const soldierMovementSystem = new SoldierMovementSystem(
   soldier.getComponent("movement"),
   soldier.getComponent("gravity"),
@@ -131,47 +144,67 @@ const updatableSystems: IUpdatableSystem[] = [
     slimeAttackingSystem,   
     sceneSystem,
     healthPackPickupSystem,
-    collisionSystem,
     healthBarSystem,
     animationFrameSystem,
     soldierAnimationSystem,
     slimeAnimationSystem
 ];
 
+// Collision system is added separately since it's rebuilt after map loads
+
 const eventDrivenSystems: IEventDrivenSystem[] = [
   inputSystem
 ];
 
+
+
+const gameMapLoader = new GameMapLoader(new GLTFLoader());
+const gameMap = new GameMap(gameMapLoader);
+gameMap.getInstance((model, gameObjects) => {
+
+
+  model.scale.setScalar(0.01);
+
+
+  model.scale.setScalar(0.01);
+  model.updateMatrixWorld(true);
+
+  sceneSystem.scene.add(model);
+
+  
+
+  const allEntities = [
+    soldier,
+    slime,
+    block,
+    healthPack,
+    ...gameObjects.filter(obj => obj.object3D.name.toLowerCase() !== "grass")
+  ] as any;
+
+  collisionSystem = new CollisionSystem(allEntities);
+
+  // 🟢 4. Add entities + debug AFTER everything is ready
+  for (const obj of gameObjects) {
+    sceneSystem.addGameObject(obj);
+
+    const isGrass = obj.object3D.name.toLowerCase() === "grass";
+
+
+    if (obj.collisionComponent && !isGrass) {
+      obj.collisionComponent.enableDebug(sceneSystem.scene);
+    }
+  }
+});
 const clock = new THREE.Clock();
 
 
-const mapLoader = new GLTFLoader();
-
-mapLoader.load(
-  'map-model/map.glb',
-  (gltf) => {
-
-    const model = gltf.scene;
-
-    sceneSystem.scene.add(model);
-
-    model.scale.set(0.4, .4, .4);
-    model.position.set(0, -3, 0);
-
-    console.log("Model loaded:", model);
-
-  },
-  undefined,
-  (error) => {
-    console.error("GLB load error:", error);
-  }
-);
 
 function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
   controls.update();
   updatableSystems.forEach(system => system.update(delta));
+  collisionSystem.update(delta); // Update collision system separately
 
   sceneSystem.render();
 }
