@@ -35,7 +35,6 @@ import { GameMapLoader } from "./GameMapLoader.js";
 import { GameMap } from "./GameMap.js";
 import { MapEntity } from "./MapEntity.js";
 import { CollisionComponent } from "./CollisionComponent.js";
-import { GameObject } from "./GameObject.js";
 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -96,7 +95,6 @@ const block = new Block(100, 100, 0.2);
 sceneSystem.addGameObject(block);
 block.setPosition(0,-2.7,0)
 
-sceneSystem.addLight(new THREE.AmbientLight(0xffffff, 0.5));
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(5, 10, 5);
@@ -161,17 +159,63 @@ const eventDrivenSystems: IEventDrivenSystem[] = [
 const gameMapLoader = new GameMapLoader(new GLTFLoader());
 const gameMap = new GameMap(gameMapLoader);
 gameMap.getInstance((model, gameObjects) => {
-
-
-  model.scale.setScalar(0.01);
-
-
   model.scale.setScalar(0.01);
   model.updateMatrixWorld(true);
 
   sceneSystem.scene.add(model);
 
-  
+  const torchRoots = new Map<string, THREE.Object3D>();
+  for (const obj of gameObjects) {
+    if (!obj.object3D.name.toLowerCase().includes("torch")) continue;
+
+    let root = obj.object3D;
+    while (root.parent && root.parent.name.toLowerCase().includes("torch")) {
+      root = root.parent;
+    }
+
+    torchRoots.set(root.uuid, root);
+  }
+
+  const mapBounds = new THREE.Box3().setFromObject(model);
+  const mapCenter = mapBounds.getCenter(new THREE.Vector3());
+
+  camera.position.set(10, 5, 0);
+  controls.target.copy(mapCenter);
+  camera.lookAt(mapCenter);
+  controls.update();
+
+  for (const torchRoot of torchRoots.values()) {
+    torchRoot.updateMatrixWorld(true);
+
+    const bounds = new THREE.Box3().setFromObject(torchRoot);
+    if (bounds.isEmpty()) continue;
+
+    const height = Math.max(bounds.max.y - bounds.min.y, 0.001);
+    const worldAttachPoint = new THREE.Vector3(
+      (bounds.min.x + bounds.max.x) * 0.5,
+      bounds.max.y - height * 0.2,
+      (bounds.min.z + bounds.max.z) * 0.5
+    );
+    const localAttachPoint = torchRoot.worldToLocal(worldAttachPoint.clone());
+
+    const light = new THREE.PointLight(0xff8800, 3.5, 12);
+    light.position.copy(localAttachPoint);
+    torchRoot.add(light);
+
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 16, 16),
+      new THREE.MeshStandardMaterial({
+        color: 0xffcc88,
+        emissive: 0xff7a2f,
+        emissiveIntensity: 2.8,
+        transparent: true,
+        opacity: 0.95
+      })
+    );
+
+    glow.position.copy(localAttachPoint);
+    torchRoot.add(glow);
+  }
 
   const allEntities = [
     soldier,
@@ -183,7 +227,6 @@ gameMap.getInstance((model, gameObjects) => {
 
   collisionSystem = new CollisionSystem(allEntities);
 
-  // 🟢 4. Add entities + debug AFTER everything is ready
   for (const obj of gameObjects) {
     sceneSystem.addGameObject(obj);
 

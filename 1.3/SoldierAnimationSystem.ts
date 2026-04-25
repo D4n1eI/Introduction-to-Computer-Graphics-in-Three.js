@@ -31,8 +31,6 @@ export class SoldierAnimationSystem implements IUpdatableSystem {
 
         const pos = this.soldier.object3D.position;
 
-        console.log("POS:", pos.x.toFixed(3), pos.y.toFixed(3), pos.z.toFixed(3));
-        console.log("VEL:", movement.velocity.x.toFixed(3), movement.velocity.y.toFixed(3), movement.velocity.z.toFixed(3));
         sprite.setFlipX(this.facingLeft);
 
         if (health && health.isDead) {

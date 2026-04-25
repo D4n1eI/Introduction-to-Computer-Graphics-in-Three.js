@@ -26,11 +26,9 @@ export class GameMap {
             const mesh = child as THREE.Mesh;
 
               if ((child as THREE.Mesh).isMesh) {
-                console.log("MESH FOUND:", child.name);
                 child.scale.setScalar(0.2);
             }
 
-            console.log("---- MESH ----", mesh.name);
 
             mesh.updateMatrixWorld(true);
 
@@ -49,7 +47,6 @@ export class GameMap {
                 tightBox = new THREE.Box3();
             }
 
-            console.log("TIGHT BOX for:", mesh.name, tightBox.min, tightBox.max);
 
             // Create game object for this mesh
             const gameObject = new GameObject(mesh);

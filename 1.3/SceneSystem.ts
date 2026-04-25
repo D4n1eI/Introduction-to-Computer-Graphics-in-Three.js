@@ -24,13 +24,18 @@ export class SceneSystem implements IUpdatableSystem {
 
   constructor(options: SceneSystemOptions) {
     this.renderer = options.renderer;
+
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+
     this.scene = new THREE.Scene();
     this._setupScene();
   }
 
   private _setupScene() {
-    this.scene.background = new THREE.Color(0xeeeeee);
-    this.scene.fog = new THREE.Fog(0xeeeeee, 10, 100);
+    this.scene.background = new THREE.Color(0x0a0a0a);
   }
 
   addCamera(camera: THREE.Camera, setActive = false) {
@@ -40,6 +45,17 @@ export class SceneSystem implements IUpdatableSystem {
 
   addLight(light: THREE.Light) {
     this.lights.push(light);
+
+    if ("castShadow" in light) {
+      const l = light as any;
+      l.castShadow = true;
+
+      if (l.shadow) {
+        l.shadow.mapSize?.set(1024, 1024);
+        l.shadow.bias = -0.0001;
+      }
+    }
+
     this.scene.add(light);
   }
 
@@ -47,13 +63,16 @@ export class SceneSystem implements IUpdatableSystem {
     this.gameObjects.push(gameObject);
     this.scene.add(gameObject.object3D);
 
-    const collision =
-      gameObject.collisionComponent ||
-      (gameObject instanceof Entity
-        ? gameObject.getComponent<CollisionComponent>("collision")
-        : undefined);
+    gameObject.object3D.traverse((child: any) => {
+      if (child.isMesh) {
+        if (!child.geometry.boundingSphere) {
+          child.geometry.computeBoundingSphere();
+        }
 
-
+        child.receiveShadow = true;
+        child.castShadow = child.geometry.boundingSphere.radius > 0.5;
+      }
+    });
   }
 
 
