@@ -85,7 +85,10 @@ export class SceneSystem implements IUpdatableSystem {
       this.scene.remove(collision.collisionBoxHelper);
     }
 
-    this.gameObjects = this.gameObjects.filter(obj => obj !== gameObject);
+    const index = this.gameObjects.indexOf(gameObject);
+    if (index >= 0) {
+      this.gameObjects.splice(index, 1);
+    }
   }
 
   update(delta: number) {

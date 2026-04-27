@@ -50,7 +50,7 @@ export class HealthPackFactory implements IEntityFactory {
     healthPack.addComponent("sprite", spriteComponent);
     healthPack.addComponent("health", new HealthComponent(1, eventObserver));
     healthPack.addComponent("collision", healthPackCollision);
-    healthPack.addComponent("gravity", new GravityComponent(healthPack.object3D));
+    healthPack.addComponent("gravity", new GravityComponent(healthPack.object3D, healthPackCollision));
     
     healthPack.object3D.add(spriteComponent.container);
     healthPack.object3D.position.set(5, 5, 0);

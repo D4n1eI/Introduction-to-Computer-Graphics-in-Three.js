@@ -35,11 +35,46 @@ import { GameMapLoader } from "./GameMapLoader.js";
 import { GameMap } from "./GameMap.js";
 import { MapEntity } from "./MapEntity.js";
 import { CollisionComponent } from "./CollisionComponent.js";
+import { MovementComponent } from "./MovementComponent.js";
+import { AttackingComponent } from "./AttackingComponent.js";
+import { AttackRangeComponent } from "./AttackRangeComponent.js";
+import { HealthComponent } from "./HealthComponent.js";
 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+const slimeKillCounter = document.createElement("div");
+slimeKillCounter.style.position = "fixed";
+slimeKillCounter.style.top = "16px";
+slimeKillCounter.style.left = "16px";
+slimeKillCounter.style.padding = "8px 12px";
+slimeKillCounter.style.background = "rgba(0, 0, 0, 0.65)";
+slimeKillCounter.style.color = "#f2f2f2";
+slimeKillCounter.style.fontFamily = "monospace";
+slimeKillCounter.style.fontSize = "16px";
+slimeKillCounter.style.border = "1px solid rgba(255, 255, 255, 0.3)";
+slimeKillCounter.style.borderRadius = "6px";
+slimeKillCounter.style.zIndex = "1000";
+slimeKillCounter.textContent = "Slimes Killed: 0";
+document.body.appendChild(slimeKillCounter);
+
+const gameOverOverlay = document.createElement("div");
+gameOverOverlay.style.position = "fixed";
+gameOverOverlay.style.inset = "0";
+gameOverOverlay.style.display = "none";
+gameOverOverlay.style.alignItems = "center";
+gameOverOverlay.style.justifyContent = "center";
+gameOverOverlay.style.background = "rgba(0, 0, 0, 0.75)";
+gameOverOverlay.style.color = "#ffffff";
+gameOverOverlay.style.fontFamily = "monospace";
+gameOverOverlay.style.fontSize = "48px";
+gameOverOverlay.style.fontWeight = "700";
+gameOverOverlay.style.letterSpacing = "2px";
+gameOverOverlay.style.zIndex = "2000";
+gameOverOverlay.textContent = "GAME OVER";
+document.body.appendChild(gameOverOverlay);
 
 const soundManager = SoundManager.getInstance();
 soundManager.loadSound("jump", "SoundEffects/jump.wav");
@@ -69,6 +104,10 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 
 const loader = new AnimationLoader();
+const slimeSpawnPoint = new THREE.Vector3(0, 4, 0);
+const healthPackSpawnPoint = new THREE.Vector3(-3, 4, 0);
+const SLIME_SPAWN_INTERVAL_MS = 15000;
+const HEALTHPACK_SPAWN_INTERVAL_MS = 60000;
 
 const soldierFactory: IEntityFactory = new SoldierFactory(loader);
 const slimeFactory: IEntityFactory = new SlimeFactory(loader);
@@ -76,19 +115,15 @@ const healthPackFactory: IEntityFactory = new HealthPackFactory(loader);
 
 const soldier: Soldier = soldierFactory.createEntity(eventObserver) as Soldier;
 sceneSystem.addGameObject(soldier);
-soldier.setPosition(0, 20, 0); // Spawn high to test falling
+soldier.setPosition(0, 4, 0);
 
 const slime: Slime = slimeFactory.createEntity(eventObserver) as Slime;
 sceneSystem.addGameObject(slime);
-slime.setPosition(3, 20, 0); // Spawn high to test falling
-
-const timer: number = window.setTimeout(() => {
-  console.log("Done");
-}, 30000);
+slime.setPosition(slimeSpawnPoint.x, slimeSpawnPoint.y, slimeSpawnPoint.z);
 
 const healthPack: HealthPack = healthPackFactory.createEntity(eventObserver) as HealthPack;
 sceneSystem.addGameObject(healthPack);
-healthPack.setPosition(-3, 20, 0); // Spawn high to test falling
+healthPack.setPosition(healthPackSpawnPoint.x, healthPackSpawnPoint.y, healthPackSpawnPoint.z);
 
 
 const block = new Block(100, 100, 0.2);
@@ -104,28 +139,116 @@ sceneSystem.addLight(dirLight);
 const inputSystem = new InputSystem();
 
 
-const healthBarSystem = new HealthBarSystem([soldier, slime]);
-// const animationSystem = new SpriteAnimationSystem([soldier, slime]);
-const animationFrameSystem = new AnimationFrameSystem([soldier, slime]);
+const enemies: Entity[] = [slime];
+const animationEntities: Entity[] = [soldier, slime];
+const healthBarEntities: Entity[] = [soldier, slime];
+const collisionEntities: Entity[] = [soldier, slime, block];
+const slimeSystems: IUpdatableSystem[] = [];
+let isMapReady = false;
+let isGameOver = false;
+let slimeKillCount = 0;
+const countedSlimeDeaths = new Set<Entity>();
+let slimeSpawnIntervalId = 0;
+let healthPackSpawnIntervalId = 0;
+
+function updateSlimeKillCounter(): void {
+  slimeKillCounter.textContent = `Slimes Killed: ${slimeKillCount}`;
+}
+
+function triggerGameOver(): void {
+  if (isGameOver) return;
+
+  isGameOver = true;
+  gameOverOverlay.style.display = "flex";
+  window.clearInterval(slimeSpawnIntervalId);
+  window.clearInterval(healthPackSpawnIntervalId);
+}
+
+function registerSlime(newSlime: Slime): void {
+  enemies.push(newSlime);
+  animationEntities.push(newSlime);
+  healthBarEntities.push(newSlime);
+  collisionEntities.push(newSlime);
+
+  const movement = newSlime.getComponent<MovementComponent>("movement");
+  const attack = newSlime.getComponent<AttackingComponent>("attack");
+  const attackRange = newSlime.getComponent<AttackRangeComponent>("attackRange");
+
+  if (!movement || !attack || !attackRange) {
+    console.warn("Spawned slime is missing required components.");
+    return;
+  }
+
+  slimeSystems.push(new SlimeMovementSystem(movement, soldier, newSlime));
+  slimeSystems.push(new SlimeAttackingSystem(attack, attackRange, soldier, newSlime));
+  slimeSystems.push(new SlimeAnimationSystem(newSlime));
+}
+
+registerSlime(slime);
+
+function registerHealthPack(newHealthPack: HealthPack): void {
+  animationEntities.push(newHealthPack);
+  collisionEntities.push(newHealthPack);
+}
+
+function hasActiveHealthPack(): boolean {
+  for (const gameObject of sceneSystem.gameObjects) {
+    if (!(gameObject instanceof HealthPack)) continue;
+
+    const health = gameObject.getComponent<HealthComponent>("health");
+    if (!health?.isDead) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+registerHealthPack(healthPack);
+
+const healthBarSystem = new HealthBarSystem(healthBarEntities);
+const animationFrameSystem = new AnimationFrameSystem(animationEntities);
 const healthPackPickupSystem = new HealthPackPickupSystem(sceneSystem.gameObjects as Entity[], eventObserver);
 // Collision system - will be updated after map loads
-let collisionSystem = new CollisionSystem([soldier, slime, block, healthPack]);
+let collisionSystem = new CollisionSystem(collisionEntities);
 const soldierMovementSystem = new SoldierMovementSystem(
   soldier.getComponent("movement"),
   soldier.getComponent("gravity"),
   inputSystem,
   eventObserver
 );
-const slimeMovementSystem = new SlimeMovementSystem(
-  slime.getComponent("movement"),
-  soldier,
-  slime
-);
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
-const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, [slime]);
-const slimeAnimationSystem = new SlimeAnimationSystem(slime);
-const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack")!, slime.getComponent("attackRange")!, soldier, slime);
+const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, enemies);
+const gameOverSystem: IUpdatableSystem = {
+  update(): void {
+    const health = soldier.getComponent<HealthComponent>("health");
+    if (health?.isDead) {
+      triggerGameOver();
+    }
+  }
+};
+const slimeKillTrackerSystem: IUpdatableSystem = {
+  update(): void {
+    for (const enemy of enemies) {
+      if (countedSlimeDeaths.has(enemy)) continue;
+
+      const health = enemy.getComponent<HealthComponent>("health");
+      if (!health?.isDead) continue;
+
+      countedSlimeDeaths.add(enemy);
+      slimeKillCount += 1;
+      updateSlimeKillCounter();
+    }
+  }
+};
+const dynamicSlimeSystems: IUpdatableSystem = {
+  update(delta: number): void {
+    for (const slimeSystem of slimeSystems) {
+      slimeSystem.update(delta);
+    }
+  }
+};
 // ----------------------------
 // Updatable systems array
 // ----------------------------
@@ -138,14 +261,14 @@ const slimeAttackingSystem = new SlimeAttackingSystem(slime.getComponent("attack
 const updatableSystems: IUpdatableSystem[] = [
     soldierMovementSystem,
     soldierAttackingSystem,
-    slimeMovementSystem,
-    slimeAttackingSystem,   
+  gameOverSystem,
+  slimeKillTrackerSystem,
+  dynamicSlimeSystems,
     sceneSystem,
     healthPackPickupSystem,
     healthBarSystem,
     animationFrameSystem,
     soldierAnimationSystem,
-    slimeAnimationSystem
 ];
 
 // Collision system is added separately since it's rebuilt after map loads
@@ -176,12 +299,8 @@ gameMap.getInstance((model, gameObjects) => {
     torchRoots.set(root.uuid, root);
   }
 
-  const mapBounds = new THREE.Box3().setFromObject(model);
-  const mapCenter = mapBounds.getCenter(new THREE.Vector3());
 
-  camera.position.set(10, 5, 0);
-  controls.target.copy(mapCenter);
-  camera.lookAt(mapCenter);
+  camera.position.set(0, 3, 3.9);
   controls.update();
 
   for (const torchRoot of torchRoots.values()) {
@@ -218,14 +337,11 @@ gameMap.getInstance((model, gameObjects) => {
   }
 
   const allEntities = [
-    soldier,
-    slime,
-    block,
-    healthPack,
     ...gameObjects.filter(obj => obj.object3D.name.toLowerCase() !== "grass")
-  ] as any;
+  ] as Entity[];
 
-  collisionSystem = new CollisionSystem(allEntities);
+  collisionEntities.push(...allEntities);
+  collisionSystem = new CollisionSystem(collisionEntities);
 
   for (const obj of gameObjects) {
     sceneSystem.addGameObject(obj);
@@ -237,17 +353,63 @@ gameMap.getInstance((model, gameObjects) => {
       obj.collisionComponent.enableDebug(sceneSystem.scene);
     }
   }
+
+  isMapReady = true;
 });
+
+slimeSpawnIntervalId = window.setInterval(() => {
+  if (!isMapReady) return;
+
+  const spawnedSlime = slimeFactory.createEntity(eventObserver) as Slime;
+  sceneSystem.addGameObject(spawnedSlime);
+
+  spawnedSlime.setPosition(slimeSpawnPoint.x, slimeSpawnPoint.y, slimeSpawnPoint.z);
+
+  registerSlime(spawnedSlime);
+}, SLIME_SPAWN_INTERVAL_MS);
+
+healthPackSpawnIntervalId = window.setInterval(() => {
+  if (!isMapReady || hasActiveHealthPack()) return;
+
+  const spawnedHealthPack = healthPackFactory.createEntity(eventObserver) as HealthPack;
+  sceneSystem.addGameObject(spawnedHealthPack);
+  spawnedHealthPack.setPosition(
+    healthPackSpawnPoint.x,
+    healthPackSpawnPoint.y,
+    healthPackSpawnPoint.z
+  );
+
+  registerHealthPack(spawnedHealthPack);
+}, HEALTHPACK_SPAWN_INTERVAL_MS);
+
 const clock = new THREE.Clock();
+const MAX_SIMULATION_STEP = 1 / 60;
+const MAX_ACCUMULATED_DELTA = 0.1;
 
 
 
 function animate() {
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const frameDelta = Math.min(clock.getDelta(), MAX_ACCUMULATED_DELTA);
   controls.update();
-  updatableSystems.forEach(system => system.update(delta));
-  collisionSystem.update(delta); // Update collision system separately
+
+  if (!isMapReady) {
+    sceneSystem.render();
+    return;
+  }
+
+  if (isGameOver) {
+    sceneSystem.render();
+    return;
+  }
+
+  let remaining = frameDelta;
+  while (remaining > 0) {
+    const delta = Math.min(remaining, MAX_SIMULATION_STEP);
+    updatableSystems.forEach(system => system.update(delta));
+    collisionSystem.update(delta); // Update collision system separately
+    remaining -= delta;
+  }
 
   sceneSystem.render();
 }

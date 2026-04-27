@@ -27,7 +27,7 @@ export class SlimeFactory implements IEntityFactory {
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
-        frameDuration: 0.1
+        frameDuration: 0.12
       },
 
       walk: {
@@ -35,7 +35,7 @@ export class SlimeFactory implements IEntityFactory {
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
-        frameDuration: 0.1
+        frameDuration: 0.12
       },
 
       attack: {
@@ -43,21 +43,21 @@ export class SlimeFactory implements IEntityFactory {
         tilesH: 8,
         tilesV: 1,
         numTiles: 8,
-        frameDuration: 0.155
+        frameDuration: 0.17
       },
       hurt: {
         path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png",
         tilesH: 4,
         tilesV: 1,
         numTiles: 4,
-        frameDuration: 0.125
+        frameDuration: 0.15
       },
       death: {
         path: "FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png",
         tilesH: 10,
         tilesV: 1,
         numTiles: 10,
-        frameDuration: 0.1
+        frameDuration: 0.12
       },
     };
 
