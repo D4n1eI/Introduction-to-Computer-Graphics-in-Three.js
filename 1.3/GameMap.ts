@@ -13,7 +13,7 @@ export class GameMap {
 
    getInstance(onReady: (model: THREE.Object3D, gameObjects: GameObject[]) => void) {
 
-    this.gltfLoader.loadMap("/public/map-model/map.glb", (model) => {
+    this.gltfLoader.loadMap("./public/map-model/map.glb", (model) => {
 
         model.updateMatrixWorld(true);
 

@@ -23,7 +23,7 @@ export class SlimeFactory implements IEntityFactory {
   createEntity(eventObserver?: EventObserver): Slime {
     const animationData = {
       idle: {
-        path: "/public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Idle-Sheet.png",
+        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Idle-Sheet.png",
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
@@ -31,7 +31,7 @@ export class SlimeFactory implements IEntityFactory {
       },
 
       walk: {
-        path: "/public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Jump_Fall-Sheet.png",
+        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Jump_Fall-Sheet.png",
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
@@ -39,21 +39,21 @@ export class SlimeFactory implements IEntityFactory {
       },
 
       attack: {
-        path: "/public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Attack1-Sheet.png",
+        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Attack1-Sheet.png",
         tilesH: 8,
         tilesV: 1,
         numTiles: 8,
         frameDuration: 0.17
       },
       hurt: {
-        path: "/public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png",
+        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png",
         tilesH: 4,
         tilesV: 1,
         numTiles: 4,
         frameDuration: 0.15
       },
       death: {
-        path: "/public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png",
+        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png",
         tilesH: 10,
         tilesV: 1,
         numTiles: 10,

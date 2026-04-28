@@ -76,13 +76,29 @@ gameOverOverlay.style.zIndex = "2000";
 gameOverOverlay.textContent = "GAME OVER";
 document.body.appendChild(gameOverOverlay);
 
+const winOverlay = document.createElement("div");
+winOverlay.style.position = "fixed";
+winOverlay.style.inset = "0";
+winOverlay.style.display = "none";
+winOverlay.style.alignItems = "center";
+winOverlay.style.justifyContent = "center";
+winOverlay.style.background = "rgba(0, 0, 0, 0.75)";
+winOverlay.style.color = "#00ff00";
+winOverlay.style.fontFamily = "monospace";
+winOverlay.style.fontSize = "48px";
+winOverlay.style.fontWeight = "700";
+winOverlay.style.letterSpacing = "2px";
+winOverlay.style.zIndex = "2000";
+winOverlay.textContent = "CONGRATS YOU WON!";
+document.body.appendChild(winOverlay);
+
 const soundManager = SoundManager.getInstance();
-soundManager.loadSound("jump", "/public/SoundEffects/jump.wav");
-soundManager.loadSound("power_up", "/public/SoundEffects/power_up.wav");
-soundManager.loadSound("hurt", "/public/SoundEffects/hurt.wav");
-soundManager.loadSound("explosion", "/public/SoundEffects/explosion.wav");
-soundManager.loadSound("coin", "/public/SoundEffects/coin.wav");
-soundManager.loadSound("tap", "/public/SoundEffects/tap.wav");
+soundManager.loadSound("jump", "./public/SoundEffects/jump.wav");
+soundManager.loadSound("power_up", "./public/SoundEffects/power_up.wav");
+soundManager.loadSound("hurt", "./public/SoundEffects/hurt.wav");
+soundManager.loadSound("explosion", "./public/SoundEffects/explosion.wav");
+soundManager.loadSound("coin", "./public/SoundEffects/coin.wav");
+soundManager.loadSound("tap", "./public/SoundEffects/tap.wav");
 
 // Initialize audio on first click to satisfy browser requirements
 window.addEventListener("click", () => soundManager.init(), { once: true });
@@ -146,10 +162,12 @@ const collisionEntities: Entity[] = [soldier, slime, block];
 const slimeSystems: IUpdatableSystem[] = [];
 let isMapReady = false;
 let isGameOver = false;
+let isGameWon = false;
 let slimeKillCount = 0;
 const countedSlimeDeaths = new Set<Entity>();
 let slimeSpawnIntervalId = 0;
 let healthPackSpawnIntervalId = 0;
+const SLIME_KILL_WIN_THRESHOLD = 10;
 
 function updateSlimeKillCounter(): void {
   slimeKillCounter.textContent = `Slimes Killed: ${slimeKillCount}`;
@@ -160,6 +178,15 @@ function triggerGameOver(): void {
 
   isGameOver = true;
   gameOverOverlay.style.display = "flex";
+  window.clearInterval(slimeSpawnIntervalId);
+  window.clearInterval(healthPackSpawnIntervalId);
+}
+
+function triggerGameWin(): void {
+  if (isGameWon) return;
+
+  isGameWon = true;
+  winOverlay.style.display = "flex";
   window.clearInterval(slimeSpawnIntervalId);
   window.clearInterval(healthPackSpawnIntervalId);
 }
@@ -239,6 +266,10 @@ const slimeKillTrackerSystem: IUpdatableSystem = {
       countedSlimeDeaths.add(enemy);
       slimeKillCount += 1;
       updateSlimeKillCounter();
+
+      if (slimeKillCount >= SLIME_KILL_WIN_THRESHOLD) {
+        triggerGameWin();
+      }
     }
   }
 };
@@ -398,7 +429,7 @@ function animate() {
     return;
   }
 
-  if (isGameOver) {
+  if (isGameOver || isGameWon) {
     sceneSystem.render();
     return;
   }
