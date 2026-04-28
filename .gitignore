@@ -1,0 +1,20 @@
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# VS Code settings
+.vscode/
+
+# Local env files
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
