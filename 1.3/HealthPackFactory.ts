@@ -19,7 +19,7 @@ export class HealthPackFactory implements IEntityFactory {
   createEntity(eventObserver?: EventObserver): HealthPack {
     const animationData = {
       idle: {
-        path: "HealthPack/Heart Pickup.png",
+        path: "/public/HealthPack/Heart Pickup.png",
         tilesH: 3,
         tilesV: 2,
         numTiles: 6,

@@ -77,12 +77,12 @@ gameOverOverlay.textContent = "GAME OVER";
 document.body.appendChild(gameOverOverlay);
 
 const soundManager = SoundManager.getInstance();
-soundManager.loadSound("jump", "SoundEffects/jump.wav");
-soundManager.loadSound("power_up", "SoundEffects/power_up.wav");
-soundManager.loadSound("hurt", "SoundEffects/hurt.wav");
-soundManager.loadSound("explosion", "SoundEffects/explosion.wav");
-soundManager.loadSound("coin", "SoundEffects/coin.wav");
-soundManager.loadSound("tap", "SoundEffects/tap.wav");
+soundManager.loadSound("jump", "/public/SoundEffects/jump.wav");
+soundManager.loadSound("power_up", "/public/SoundEffects/power_up.wav");
+soundManager.loadSound("hurt", "/public/SoundEffects/hurt.wav");
+soundManager.loadSound("explosion", "/public/SoundEffects/explosion.wav");
+soundManager.loadSound("coin", "/public/SoundEffects/coin.wav");
+soundManager.loadSound("tap", "/public/SoundEffects/tap.wav");
 
 // Initialize audio on first click to satisfy browser requirements
 window.addEventListener("click", () => soundManager.init(), { once: true });
