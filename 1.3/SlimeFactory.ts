@@ -47,14 +47,14 @@ export class SlimeFactory implements IEntityFactory {
         frameDuration: 0.17
       },
       hurt: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Hurt-Sheet.png"),
         tilesH: 4,
         tilesV: 1,
         numTiles: 4,
         frameDuration: 0.15
       },
       death: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Death-Sheet.png"),
         tilesH: 10,
         tilesV: 1,
         numTiles: 10,

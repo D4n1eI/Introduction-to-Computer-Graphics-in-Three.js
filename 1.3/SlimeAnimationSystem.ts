@@ -35,6 +35,8 @@ export class SlimeAnimationSystem implements IUpdatableSystem{
         }
 
         if (health && health.hurtTimer > 0) {
+            movement.velocity.x = 0;
+            movement.velocity.z = 0;
             sprite.playAnimation("hurt");
             return;
         }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js Test — Local Preview</title>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+          "three/examples/jsm/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- This file loads the built bundle from dist so you can preview without Vite.
+         It rewrites absolute Pages-prefixed requests to the dist folder so assets
+         load correctly when serving the repo parent directory. Open with a static
+         server (Live Server or `python -m http.server`) and not via file://
+    -->
+    <script>
+      (function(){
+        const prefix = '/Introduction-to-Computer-Graphics-in-Three.js/';
+        const rewrite = (u) => {
+          try {
+            if (typeof u === 'string') {
+              const i = u.indexOf(prefix);
+              if (i !== -1) return u.slice(0, i) + prefix + 'dist/' + u.slice(i + prefix.length);
+            } else if (u && u.url && typeof u.url === 'string') {
+              const i = u.url.indexOf(prefix);
+              if (i !== -1) return new Request(u.url.slice(0,i) + prefix + 'dist/' + u.url.slice(i + prefix.length), u);
+            }
+          } catch (e) {}
+          return u;
+        };
+        const origFetch = window.fetch.bind(window);
+        window.fetch = function(resource, init){
+          return origFetch(rewrite(resource), init);
+        };
+        const origOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url){
+          try { url = rewrite(url); } catch(e){}
+          return origOpen.call(this, method, url, ...Array.prototype.slice.call(arguments,2));
+        };
+      })();
+    </script>
+    <script type="module" crossorigin src="./dist/assets/index-ChX7Y2jh.js"></script>
+  </body>
+</html>
