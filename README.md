@@ -19,3 +19,4 @@ This repo is set up to deploy automatically from the `main` branch using [`.gith
 1. Install dependencies with `npm ci`.
 2. Run `npm run dev` for local editing.
 3. Run `npm run build` before pushing if you want to verify the production bundle.
+4. If you want a static preview, serve the generated `dist/` folder instead of opening `1.3/index.html` directly.
