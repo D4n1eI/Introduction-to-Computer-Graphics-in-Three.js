@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GameObject } from "./GameObject.js";
 import { GameMapLoader } from "./GameMapLoader.js";
 import { CollisionComponent } from "./CollisionComponent.js";
+import { assetUrl } from "./assetUrl.js";
 
 export class GameMap {
     gltfLoader: GameMapLoader;
@@ -13,7 +14,7 @@ export class GameMap {
 
    getInstance(onReady: (model: THREE.Object3D, gameObjects: GameObject[]) => void) {
 
-    this.gltfLoader.loadMap("./public/map-model/map.glb", (model) => {
+    this.gltfLoader.loadMap(assetUrl("map-model/map.glb"), (model) => {
 
         model.updateMatrixWorld(true);
 

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { type IComponent } from "./IComponent.js";
+import { assetUrl } from "./assetUrl.js";
 
 export class HealthBarComponent implements IComponent {
     private barMesh: THREE.Sprite;
@@ -15,7 +16,7 @@ export class HealthBarComponent implements IComponent {
         // Load all 11 health bar textures (0 to 10)
         for (let i = 0; i <= 10; i++) {
             const fileName = `health_${i.toString().padStart(2, '0')}.png`;
-            const tex = loader.load(`./public/Pastinhas/${fileName}`);
+            const tex = loader.load(assetUrl(`Pastinhas/${fileName}`));
             tex.magFilter = THREE.NearestFilter;
             tex.minFilter = THREE.NearestFilter;
             this.textures.push(tex);

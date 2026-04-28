@@ -29,6 +29,7 @@ import { HealthPack } from "./HealthPack.js";
 import { HealthPackPickupSystem } from "./HealthPackPickupSystem.js";
 import { EventObserver } from "./EventObserver.js";
 import { SoundManager } from "./SoundManager.js";
+import { assetUrl } from "./assetUrl.js";
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { GameMapLoader } from "./GameMapLoader.js";
@@ -93,12 +94,12 @@ winOverlay.textContent = "CONGRATS YOU WON!";
 document.body.appendChild(winOverlay);
 
 const soundManager = SoundManager.getInstance();
-soundManager.loadSound("jump", "./public/SoundEffects/jump.wav");
-soundManager.loadSound("power_up", "./public/SoundEffects/power_up.wav");
-soundManager.loadSound("hurt", "./public/SoundEffects/hurt.wav");
-soundManager.loadSound("explosion", "./public/SoundEffects/explosion.wav");
-soundManager.loadSound("coin", "./public/SoundEffects/coin.wav");
-soundManager.loadSound("tap", "./public/SoundEffects/tap.wav");
+soundManager.loadSound("jump", assetUrl("SoundEffects/jump.wav"));
+soundManager.loadSound("power_up", assetUrl("SoundEffects/power_up.wav"));
+soundManager.loadSound("hurt", assetUrl("SoundEffects/hurt.wav"));
+soundManager.loadSound("explosion", assetUrl("SoundEffects/explosion.wav"));
+soundManager.loadSound("coin", assetUrl("SoundEffects/coin.wav"));
+soundManager.loadSound("tap", assetUrl("SoundEffects/tap.wav"));
 
 // Initialize audio on first click to satisfy browser requirements
 window.addEventListener("click", () => soundManager.init(), { once: true });

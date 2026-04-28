@@ -8,6 +8,7 @@ import { HealthPack } from "./HealthPack.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { CollisionComponent } from "./CollisionComponent.js";
 import { EventObserver } from "./EventObserver.js";
+import { assetUrl } from "./assetUrl.js";
 
 export class HealthPackFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -19,7 +20,7 @@ export class HealthPackFactory implements IEntityFactory {
   createEntity(eventObserver?: EventObserver): HealthPack {
     const animationData = {
       idle: {
-        path: "./public/HealthPack/Heart Pickup.png",
+        path: assetUrl("HealthPack/Heart Pickup.png"),
         tilesH: 3,
         tilesV: 2,
         numTiles: 6,

@@ -12,6 +12,7 @@ import { HealthBarComponent } from "./HealthBarComponent.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { AttackingComponent } from "./AttackingComponent.js";
 import { EventObserver } from "./EventObserver.js";
+import { assetUrl } from "./assetUrl.js";
 
 export class SoldierFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -23,42 +24,42 @@ export class SoldierFactory implements IEntityFactory {
   createEntity(eventObserver?: EventObserver): Soldier {
     const animationData = {
       idle: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Idle-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Idle-Sheet.png"),
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
         frameDuration: 0.1
       },
       walk: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Walk-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Walk-Sheet.png"),
         tilesH: 8,
         tilesV: 1,
         numTiles: 8,
         frameDuration: 0.1
       },
       jump: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Jump_Fall-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Jump_Fall-Sheet.png"),
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
         frameDuration: 0.1
       },
       attack: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Attack1-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Attack1-Sheet.png"),
         tilesH: 8,
         tilesV: 1,
         numTiles: 8,
         frameDuration: 0.1
       },
       hurt: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Hurt-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Hurt-Sheet.png"),
         tilesH: 4,
         tilesV: 1,
         numTiles: 4,
         frameDuration: 0.125
       },
       death: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Death-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Human_Soldier_Sword_Shield/No_Shadows/Human_Soldier_Sword_Shield_Death-Sheet.png"),
         tilesH: 10,
         tilesV: 1,
         numTiles: 10,

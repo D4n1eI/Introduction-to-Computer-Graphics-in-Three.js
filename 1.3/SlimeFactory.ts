@@ -12,6 +12,7 @@ import { HealthBarComponent } from "./HealthBarComponent.js";
 import { HealthComponent } from "./HealthComponent.js";
 import { AttackingComponent } from "./AttackingComponent.js";
 import { EventObserver } from "./EventObserver.js";
+import { assetUrl } from "./assetUrl.js";
 
 export class SlimeFactory implements IEntityFactory {
   private animationLoader: AnimationLoader;
@@ -23,7 +24,7 @@ export class SlimeFactory implements IEntityFactory {
   createEntity(eventObserver?: EventObserver): Slime {
     const animationData = {
       idle: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Idle-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Idle-Sheet.png"),
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
@@ -31,7 +32,7 @@ export class SlimeFactory implements IEntityFactory {
       },
 
       walk: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Jump_Fall-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Jump_Fall-Sheet.png"),
         tilesH: 6,
         tilesV: 1,
         numTiles: 6,
@@ -39,7 +40,7 @@ export class SlimeFactory implements IEntityFactory {
       },
 
       attack: {
-        path: "./public/FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Attack1-Sheet.png",
+        path: assetUrl("FreeCharactersAnimationsAssetPack/SpriteSheets(96x96)/Monster_Slime/No_Shadows/Monster_Slime_Attack1-Sheet.png"),
         tilesH: 8,
         tilesV: 1,
         numTiles: 8,
