@@ -1,3 +1,7 @@
 export function assetUrl(path: string): string {
-  return new URL(path, import.meta.env.BASE_URL).href;
+  const basePath = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+
+  return `${basePath}${path.replace(/^\//, "")}`;
 }
