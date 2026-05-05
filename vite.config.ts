@@ -4,7 +4,7 @@ export default defineConfig({
   root: "src/dist",
   base: "/Introduction-to-Computer-Graphics-in-Three.js/",
   build: {
-    outDir: "../../dist",
+    outDir: "./dist",
     emptyOutDir: true,
   },
 });
