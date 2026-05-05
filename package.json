@@ -1,20 +1,17 @@
 {
-  "name": "icu-project",
+  "name": "introduction-to-computer-graphics-in-three-js",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "homepage": "https://d4n1ei.github.io/Introduction-to-Computer-Graphics-in-Three.js/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "three": "^0.160.0"
+    "three": "^0.162.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "@types/three": "^0.160.0",
-    "gh-pages": "^6.3.0",
-    "typescript": "^6.0.2"
+    "vite": "^5.4.19"
   }
 }
