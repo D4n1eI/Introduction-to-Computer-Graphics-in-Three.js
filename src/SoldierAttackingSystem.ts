@@ -14,12 +14,19 @@ export class SoldierAttackingSystem implements IUpdatableSystem {
     soldier: Entity;
     enemies: Entity[];
     damagedEnemiesThisAttack: Set<Entity> = new Set();
+    onEnemyKilled?: (enemy: Entity) => void;
 
-    constructor(inputSystem: InputSystem, soldier: Entity, enemies: Entity[]) {
+    constructor(
+        inputSystem: InputSystem,
+        soldier: Entity,
+        enemies: Entity[],
+        onEnemyKilled?: (enemy: Entity) => void
+    ) {
         this.inputSystem = inputSystem;
         this.soldier = soldier;
         this.soldierAttack = soldier.getComponent<AttackingComponent>("attack")!;
         this.enemies = enemies;
+        this.onEnemyKilled = onEnemyKilled;
     }
 
     update(delta: number): void {
@@ -37,8 +44,12 @@ export class SoldierAttackingSystem implements IUpdatableSystem {
                         if (!this.damagedEnemiesThisAttack.has(enemy) && range.checkCollision(enemy)) {
                             const health = enemy.getComponent<HealthComponent>("health");
                             if (health) {
+                                const wasDead = health.isDead;
                                 health.takeDamage(1);
                                 console.log("Soldier hit Slime! Health:", health.currentHealth);
+                                if (!wasDead && health.isDead) {
+                                    this.onEnemyKilled?.(enemy);
+                                }
                                 this.damagedEnemiesThisAttack.add(enemy);
                             }
                         }

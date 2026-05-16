@@ -12,6 +12,22 @@ export class GameMap {
         this.gltfLoader = gltfLoader;
     }
 
+   private makeMapMaterialUnlit(material: THREE.Material): THREE.Material {
+    const source = material as THREE.MeshStandardMaterial;
+    const basicMaterial = new THREE.MeshBasicMaterial({
+        map: source.map ?? null,
+        color: source.color ?? new THREE.Color(0xffffff),
+        transparent: source.transparent,
+        opacity: source.opacity,
+        alphaTest: source.alphaTest,
+        side: source.side
+    });
+
+    basicMaterial.name = material.name;
+    basicMaterial.needsUpdate = true;
+    return basicMaterial;
+   }
+
    getInstance(onReady: (model: THREE.Object3D, gameObjects: GameObject[]) => void) {
 
     this.gltfLoader.loadMap(assetUrl("map-model/map.glb"), (model) => {
@@ -25,6 +41,12 @@ export class GameMap {
             if (!(child instanceof THREE.Mesh)) return;
 
             const mesh = child as THREE.Mesh;
+
+            if (Array.isArray(mesh.material)) {
+                mesh.material = mesh.material.map((material) => this.makeMapMaterialUnlit(material));
+            } else {
+                mesh.material = this.makeMapMaterialUnlit(mesh.material);
+            }
 
               if ((child as THREE.Mesh).isMesh) {
                 child.scale.setScalar(0.2);

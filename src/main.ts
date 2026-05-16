@@ -174,6 +174,18 @@ function updateSlimeKillCounter(): void {
   slimeKillCounter.textContent = `Slimes Killed: ${slimeKillCount}`;
 }
 
+function countSlimeKill(enemy: Entity): void {
+  if (countedSlimeDeaths.has(enemy)) return;
+
+  countedSlimeDeaths.add(enemy);
+  slimeKillCount += 1;
+  updateSlimeKillCounter();
+
+  if (slimeKillCount >= SLIME_KILL_WIN_THRESHOLD) {
+    triggerGameWin();
+  }
+}
+
 function triggerGameOver(): void {
   if (isGameOver) return;
 
@@ -247,7 +259,7 @@ const soldierMovementSystem = new SoldierMovementSystem(
 );
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
-const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, enemies);
+const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, enemies, countSlimeKill);
 const gameOverSystem: IUpdatableSystem = {
   update(): void {
     const health = soldier.getComponent<HealthComponent>("health");
@@ -259,18 +271,10 @@ const gameOverSystem: IUpdatableSystem = {
 const slimeKillTrackerSystem: IUpdatableSystem = {
   update(): void {
     for (const enemy of enemies) {
-      if (countedSlimeDeaths.has(enemy)) continue;
-
       const health = enemy.getComponent<HealthComponent>("health");
       if (!health?.isDead) continue;
 
-      countedSlimeDeaths.add(enemy);
-      slimeKillCount += 1;
-      updateSlimeKillCounter();
-
-      if (slimeKillCount >= SLIME_KILL_WIN_THRESHOLD) {
-        triggerGameWin();
-      }
+      countSlimeKill(enemy);
     }
   }
 };
