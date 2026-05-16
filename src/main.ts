@@ -168,7 +168,7 @@ let slimeKillCount = 0;
 const countedSlimeDeaths = new Set<Entity>();
 let slimeSpawnIntervalId = 0;
 let healthPackSpawnIntervalId = 0;
-const SLIME_KILL_WIN_THRESHOLD = 10;
+const SLIME_KILL_WIN_THRESHOLD = 5;
 
 function updateSlimeKillCounter(): void {
   slimeKillCounter.textContent = `Slimes Killed: ${slimeKillCount}`;
