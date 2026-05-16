@@ -174,18 +174,6 @@ function updateSlimeKillCounter(): void {
   slimeKillCounter.textContent = `Slimes Killed: ${slimeKillCount}`;
 }
 
-function countSlimeKill(enemy: Entity): void {
-  if (countedSlimeDeaths.has(enemy)) return;
-
-  countedSlimeDeaths.add(enemy);
-  slimeKillCount += 1;
-  updateSlimeKillCounter();
-
-  if (slimeKillCount >= SLIME_KILL_WIN_THRESHOLD) {
-    triggerGameWin();
-  }
-}
-
 function triggerGameOver(): void {
   if (isGameOver) return;
 
@@ -259,7 +247,7 @@ const soldierMovementSystem = new SoldierMovementSystem(
 );
 
 const soldierAnimationSystem = new SoldierAnimationSystem(soldier);
-const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, enemies, countSlimeKill);
+const soldierAttackingSystem = new SoldierAttackingSystem(inputSystem, soldier, enemies);
 const gameOverSystem: IUpdatableSystem = {
   update(): void {
     const health = soldier.getComponent<HealthComponent>("health");
@@ -271,10 +259,18 @@ const gameOverSystem: IUpdatableSystem = {
 const slimeKillTrackerSystem: IUpdatableSystem = {
   update(): void {
     for (const enemy of enemies) {
+      if (countedSlimeDeaths.has(enemy)) continue;
+
       const health = enemy.getComponent<HealthComponent>("health");
       if (!health?.isDead) continue;
 
-      countSlimeKill(enemy);
+      countedSlimeDeaths.add(enemy);
+      slimeKillCount += 1;
+      updateSlimeKillCounter();
+
+      if (slimeKillCount >= SLIME_KILL_WIN_THRESHOLD) {
+        triggerGameWin();
+      }
     }
   }
 };
@@ -353,16 +349,14 @@ gameMap.getInstance((model, gameObjects) => {
     );
     const localAttachPoint = torchRoot.worldToLocal(worldAttachPoint.clone());
 
-    const light = new THREE.PointLight(0xff8800, 3.5, 12);
+    const light = new THREE.PointLight(0xff8800, 8, 18);
     light.position.copy(localAttachPoint);
     torchRoot.add(light);
 
     const glow = new THREE.Mesh(
-      new THREE.SphereGeometry(0.12, 16, 16),
-      new THREE.MeshStandardMaterial({
+      new THREE.SphereGeometry(0.18, 16, 16),
+      new THREE.MeshBasicMaterial({
         color: 0xffcc88,
-        emissive: 0xff7a2f,
-        emissiveIntensity: 2.8,
         transparent: true,
         opacity: 0.95
       })

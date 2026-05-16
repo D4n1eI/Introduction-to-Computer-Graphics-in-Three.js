@@ -12,20 +12,19 @@ export class GameMap {
         this.gltfLoader = gltfLoader;
     }
 
-   private makeMapMaterialUnlit(material: THREE.Material): THREE.Material {
-    const source = material as THREE.MeshStandardMaterial;
-    const basicMaterial = new THREE.MeshBasicMaterial({
-        map: source.map ?? null,
-        color: source.color ?? new THREE.Color(0xffffff),
-        transparent: source.transparent,
-        opacity: source.opacity,
-        alphaTest: source.alphaTest,
-        side: source.side
-    });
+   private prepareMapMaterial(material: THREE.Material): void {
+    const meshMaterial = material as THREE.MeshStandardMaterial;
 
-    basicMaterial.name = material.name;
-    basicMaterial.needsUpdate = true;
-    return basicMaterial;
+    if (meshMaterial.map) {
+        meshMaterial.map.colorSpace = THREE.SRGBColorSpace;
+        meshMaterial.map.needsUpdate = true;
+    }
+
+    if ("emissiveIntensity" in meshMaterial) {
+        meshMaterial.emissiveIntensity = Math.max(meshMaterial.emissiveIntensity ?? 0, 0.15);
+    }
+
+    material.needsUpdate = true;
    }
 
    getInstance(onReady: (model: THREE.Object3D, gameObjects: GameObject[]) => void) {
@@ -43,9 +42,9 @@ export class GameMap {
             const mesh = child as THREE.Mesh;
 
             if (Array.isArray(mesh.material)) {
-                mesh.material = mesh.material.map((material) => this.makeMapMaterialUnlit(material));
+                mesh.material.forEach((material) => this.prepareMapMaterial(material));
             } else {
-                mesh.material = this.makeMapMaterialUnlit(mesh.material);
+                this.prepareMapMaterial(mesh.material);
             }
 
               if ((child as THREE.Mesh).isMesh) {
