@@ -5,6 +5,8 @@ dist/
 *.js.map
 *.d.ts
 *.d.ts.map
+!docs/dist/
+!docs/dist/**
 
 .vscode/
 
