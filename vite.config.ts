@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: "src/dist",
+  root: "src",
   base: "/Introduction-to-Computer-Graphics-in-Three.js/",
   build: {
-    outDir: "./dist",
+    outDir: "../dist",
     emptyOutDir: true,
   },
 });

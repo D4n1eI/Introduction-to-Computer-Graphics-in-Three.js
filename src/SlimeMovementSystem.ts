@@ -81,6 +81,12 @@ export class SlimeMovementSystem implements IUpdatableSystem {
     }
 
     private generateDirection(): THREE.Vector3 {
+        if (this.slimeEntity && this.slimeEntity.object3D.position.lengthSq() > 225) {
+            const dir = new THREE.Vector3(0, 0, 0).sub(this.slimeEntity.object3D.position);
+            dir.y = 0;
+            return dir.normalize();
+        }
+        
         const dir = new THREE.Vector3().randomDirection();
         dir.y = 0;
         dir.normalize();

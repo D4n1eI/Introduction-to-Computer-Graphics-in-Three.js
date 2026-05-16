@@ -8,6 +8,8 @@ import { HealthPack } from "./HealthPack.js";
 import { Block } from "./Block.js";
 import { GameObject } from "./GameObject.js";
 import { HealthComponent } from "./HealthComponent.js";
+import { Soldier } from "./Soldier.js";
+import { Slime } from "./Slime.js";
 
 export class CollisionSystem implements IUpdatableSystem {
 	Entities: Entity[];
@@ -129,6 +131,20 @@ export class CollisionSystem implements IUpdatableSystem {
                             if (diff > EPSILON) {
                                 entity.object3D.position.copy(originalPos);
                             }
+                        }
+
+                        if ((entity instanceof Slime || entity instanceof Soldier) &&
+                            (otherEntity instanceof Slime || otherEntity instanceof Soldier)) {
+                            const pushDir = new THREE.Vector3().subVectors(
+                                entity.object3D.position,
+                                otherEntity.object3D.position
+                            );
+                            pushDir.y = 0;
+                            if (pushDir.lengthSq() < 0.001) {
+                                pushDir.set(Math.random() - 0.5, 0, Math.random() - 0.5);
+                            }
+                            pushDir.normalize().multiplyScalar(0.05);
+                            entity.object3D.position.add(pushDir);
                         }
                     }
 

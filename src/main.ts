@@ -132,7 +132,7 @@ const healthPackFactory: IEntityFactory = new HealthPackFactory(loader);
 
 const soldier: Soldier = soldierFactory.createEntity(eventObserver) as Soldier;
 sceneSystem.addGameObject(soldier);
-soldier.setPosition(0, 4, 0);
+soldier.setPosition(0, 4, 3);
 
 const slime: Slime = slimeFactory.createEntity(eventObserver) as Slime;
 sceneSystem.addGameObject(slime);

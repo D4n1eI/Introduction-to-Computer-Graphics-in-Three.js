@@ -97,7 +97,7 @@ export class SoldierFactory implements IEntityFactory {
     soldier.addComponent("healthbar", new HealthBarComponent(soldier.object3D, 1, 0.1));
     soldier.addComponent("attack", new AttackingComponent(0.4,0.6));
     soldier.object3D.add(spriteComponent.container);
-    soldier.object3D.position.set(-2, 2, 0);
+    soldier.object3D.position.set(0, 4, 3);
     return soldier;
   }
 }
