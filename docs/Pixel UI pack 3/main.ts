@@ -421,7 +421,6 @@ const MAX_ACCUMULATED_DELTA = 0.1;
 function animate() {
   requestAnimationFrame(animate);
   const frameDelta = Math.min(clock.getDelta(), MAX_ACCUMULATED_DELTA);
-  controls.update();
 
   if (!isMapReady) {
     sceneSystem.render();
